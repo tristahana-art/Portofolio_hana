@@ -1,0 +1,761 @@
+{
+  "layout": {
+    "sections": [
+      {
+        "id": "cover",
+        "name": "Cover & Hero",
+        "visible": true,
+        "order": 1
+      },
+      {
+        "id": "metrics",
+        "name": "Key Metrics Strip",
+        "visible": true,
+        "order": 2
+      },
+      {
+        "id": "intro",
+        "name": "Introduction & Welcome",
+        "visible": true,
+        "order": 3
+      },
+      {
+        "id": "profile",
+        "name": "Profile & Academics",
+        "visible": true,
+        "order": 4
+      },
+      {
+        "id": "experience",
+        "name": "Experience Chapters",
+        "visible": true,
+        "order": 5
+      },
+      {
+        "id": "frontline",
+        "name": "Work Experience",
+        "visible": true,
+        "order": 6
+      },
+      {
+        "id": "contact",
+        "name": "Direct Contact Channels",
+        "visible": true,
+        "order": 7
+      }
+    ]
+  },
+  "profile": {
+    "name": "Trista Hana Qonita Rahmawati",
+    "shortName": "Hana",
+    "title": "Project Operation & HR Candidate Portfolio",
+    "headline": "Management Student and HR & Project Operation Candidate",
+    "avatar": "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=1200&q=100",
+    "university": "UPN \"Veteran\" Yogyakarta",
+    "major": "Bachelor of Management",
+    "cohort": "2023 - Present",
+    "gpa": "3.88 / 4.00",
+    "credits": "84 Credits",
+    "highSchool": "SMAN 7 Yogyakarta (2020 - 2023)",
+    "location": "Yogyakarta, Indonesia",
+    "email": "tristahana@gmail.com",
+    "phone": "+62 812-2960-6200",
+    "linkedin": "https://www.linkedin.com/in/tristahana",
+    "instagram": "https://www.instagram.com/tristahana",
+    "bioSummary": "Over two years of hands-on experience in project coordination, recruitment, HR administration, and organizational operations. Skilled in structured program coordination, applicant data management, and operational workflows across organizations, internships, and campus initiatives.",
+    "introHeading": "Hi! Get to know me, I'm Hana.",
+    "introGreeting": "A Management student at UPN \"Veteran\" Yogyakarta with a deep focus on Human Resources and Project Operations. My background spans candidate recruitment pipelines, applicant tracking systems, SOP standardization, and team engagement initiatives across corporate internships and campus leadership roles.\n\nThroughout my journey, I have managed 300+ applicant and participant records, implemented structured OKR tracking frameworks, maintained rigorous HR documentation, and led cross-functional teams across multiple concurrent programs.\n\nI am passionate about building disciplined, data-driven, and people-centered operational systems that drive organizational goals and empower individual talent.",
+    "workloadPitch": "Translating frontline operational discipline into strategic human resources and project execution excellence.",
+    "keywords": [
+      "Talent Acquisition",
+      "Project & Event Coordination",
+      "Applicant Data Management",
+      "SOP Standardization",
+      "OKR Performance Tracking",
+      "Member Engagement"
+    ],
+    "relatedSkills": [
+      "Project & Program Coordination",
+      "Talent Acquisition & Screening",
+      "Applicant Data Management & Tracking",
+      "SOP Standardization & Workflow Governance",
+      "OKR & Timeline Monitoring",
+      "Member Engagement & Retention",
+      "Cross-Functional & Stakeholder Communication"
+    ],
+    "relatedCourses": [
+      "Human Resource Management",
+      "Organizational Behavior",
+      "Industrial Relations & Labor Law",
+      "Strategic Management",
+      "Performance & Compensation Management",
+      "Production Planning & Inventory Control (PPIC)"
+    ],
+    "tools": [
+      "Google Sheets & Advanced Formulas",
+      "Google Workspace Suite",
+      "Microsoft Excel & Office 365",
+      "Canva Pro & Visual Decks",
+      "Applicant Tracking Spreadsheets",
+      "BOD Scorecard & OKR Tracking Spreadsheets",
+      "Trello & Notion Task Boards"
+    ]
+  },
+  "metrics": [
+    {
+      "value": "220+",
+      "label": "Applicants Managed",
+      "description": "Structured screening, qualification, and data management across active hiring cycles."
+    },
+    {
+      "value": "9/10",
+      "label": "Hiring Manager Rating",
+      "description": "Consistent positive stakeholder feedback on candidate quality, communication, and speed."
+    },
+    {
+      "value": "300+",
+      "label": "Records & Contracts",
+      "description": "Organized applicant data, standardized MoUs, and employee documentation."
+    },
+    {
+      "value": "~70%",
+      "label": "Discipline Improvement",
+      "description": "Surge in team punctuality and engagement via structured incentive initiatives."
+    }
+  ],
+  "chapters": [
+    {
+      "id": "hr-campaign",
+      "number": "01",
+      "title": "HR Campaign",
+      "shortDesc": "Case Competitions, Social Innovation & Youth Career Initiatives."
+    },
+    {
+      "id": "work-experience",
+      "number": "02",
+      "title": "Work Experience",
+      "shortDesc": "Recruitment Operations, Candidate Sourcing & Team Leadership."
+    },
+    {
+      "id": "sertifikasi",
+      "number": "03",
+      "title": "Certifications",
+      "shortDesc": "National Professional Certifications & Execution Process."
+    },
+    {
+      "id": "project-leader",
+      "number": "04",
+      "title": "Project (as Leader)",
+      "shortDesc": "OKR Performance Systems, SOP Standardization & Workflow Automation."
+    },
+    {
+      "id": "organizational",
+      "number": "05",
+      "title": "Organizational Experience",
+      "shortDesc": "Divisional Leadership, Member Engagement & Cross-Team Synergy."
+    },
+    {
+      "id": "others",
+      "number": "06",
+      "title": "Others",
+      "shortDesc": "International Summits, Campus Events & Administrative Support."
+    }
+  ],
+  "items": [
+    {
+      "id": "item-ascend-unair",
+      "chapterId": "hr-campaign",
+      "title": "ASCEND DWdG UNAIR 2026 - Leadership & Social Innovation Campaign",
+      "organization": "Universitas Airlangga (UNAIR) & DWdG",
+      "role": "Semifinalist & Strategic Campaign Lead",
+      "period": "Apr - Jun 2026",
+      "location": "Surabaya / Yogyakarta",
+      "image": "https://images.unsplash.com/photo-1531482615713-2afd69097998?auto=format&fit=crop&w=800&q=80",
+      "description": "Formulated strategic solutions in a nationwide leadership and social innovation competition. Developed a comprehensive HR campaign framework designed to bridge youth talent gaps and strengthen career readiness in the digital era.",
+      "badges": [
+        "National Semifinalist",
+        "Leadership & Social Innovation",
+        "UNAIR 2026"
+      ],
+      "steppingStones": [
+        {
+          "stepNumber": 1,
+          "title": "Talent Needs Assessment & Research",
+          "detail": "Identified youth competency challenges and modern employer requirements through primary data gathering and case analysis.",
+          "metric": "Real-world case analysis"
+        },
+        {
+          "stepNumber": 2,
+          "title": "Campaign Framework Formulation",
+          "detail": "Formulated a structured talent enablement curriculum, practical success indicators, and an actionable rollout timeline.",
+          "metric": "Tested strategic framework"
+        },
+        {
+          "stepNumber": 3,
+          "title": "Interactive Pitch Deck & Visual Synthesis",
+          "detail": "Engineered an executive presentation deck and strategic summary adhering to professional corporate standards for the judging panel.",
+          "metric": "Executive jury deck ready"
+        },
+        {
+          "stepNumber": 4,
+          "title": "National Semifinal Defense Presentation",
+          "detail": "Defended the social innovation proposal live before a panel of distinguished academic adjudicators and industry practitioners.",
+          "metric": "Certificate No. 094/DWDG/ASCEND/VI/2026"
+        }
+      ],
+      "links": [
+        {
+          "title": "ASCEND DWdG Semifinalist Certificate",
+          "url": "https://drive.google.com/file/d/example-ascend/view",
+          "category": "certificate"
+        },
+        {
+          "title": "Strategic Proposal & Pitch Deck",
+          "url": "https://docs.google.com/presentation/d/example-ascend-deck/view",
+          "category": "presentation"
+        }
+      ]
+    },
+    {
+      "id": "item-growth-skill-head",
+      "chapterId": "work-experience",
+      "title": "Head of Human Resource Development (HRD)",
+      "organization": "Growth Skill (PT Tumbuh Indonesia)",
+      "role": "Head of HRD",
+      "period": "Mar - Jun 2026",
+      "location": "Jakarta / Remote",
+      "image": "https://images.unsplash.com/photo-1542744173-8e7e53415bb0?auto=format&fit=crop&w=800&q=80",
+      "description": "Led the HRD division in managing talent recruitment, program execution, and day-to-day performance tracking. Directly directed 11 divisional members to execute 7+ concurrent organizational programs.",
+      "badges": [
+        "11 HR Members Led",
+        "7+ Programs Coordinated",
+        "Best Awardee Head",
+        "Excellent A Grade"
+      ],
+      "steppingStones": [
+        {
+          "stepNumber": 1,
+          "title": "OKR Framework Setup (Batch 6)",
+          "detail": "Established weekly performance indicators for broadcast schedules, internal publications, and weekly reporting compliance.",
+          "metric": "100% Clear numerical targets"
+        },
+        {
+          "stepNumber": 2,
+          "title": "Recruitment & Onboarding Coordination",
+          "detail": "Coordinated interviews, applicant vetting, and structured onboarding of accepted members into respective departments.",
+          "metric": "Full staffing requirements met"
+        },
+        {
+          "stepNumber": 3,
+          "title": "Employee Recognition & Retention System",
+          "detail": "Implemented structured recognition routines and Best Awardee Intern honors to sustain member morale and accountability.",
+          "metric": "High attendance and retention"
+        },
+        {
+          "stepNumber": 4,
+          "title": "Four Consecutive Months Top Leadership Honors",
+          "detail": "Awarded Best Head in 4 Months consecutively, culminating in a certified Excellent A performance evaluation.",
+          "metric": "Excellent A Certificate 2026"
+        }
+      ],
+      "links": [
+        {
+          "title": "OKR & Performance Tracking Spreadsheet (Batch 6)",
+          "url": "https://docs.google.com/spreadsheets/d/example-okr-gs/view",
+          "category": "sheet"
+        },
+        {
+          "title": "Best Awardee Head & Excellent A Certificate",
+          "url": "https://drive.google.com/file/d/example-gs-award/view",
+          "category": "certificate"
+        }
+      ]
+    },
+    {
+      "id": "item-kr-intern",
+      "chapterId": "work-experience",
+      "title": "Human Resource Development (HRD) Intern",
+      "organization": "PT BP Kedaulatan Rakyat",
+      "role": "HRD Intern",
+      "period": "Jan - Jun 2026",
+      "location": "Yogyakarta",
+      "image": "https://images.unsplash.com/photo-1552664730-d307ca884978?auto=format&fit=crop&w=800&q=80",
+      "description": "Managed large-scale applicant and participant data encompassing 300+ interns. Standardized partnership agreement documents (MoU) and ensured seamless day-to-day administrative coordination under strict corporate SOPs.",
+      "badges": [
+        "300+ Applicant Data",
+        "MoU Standardized",
+        "Best Intern Award 2026"
+      ],
+      "steppingStones": [
+        {
+          "stepNumber": 1,
+          "title": "Centralized Database Management for 300+ Interns",
+          "detail": "Built a structured digital filing system for registration, document screening, and attendance logging of all participants.",
+          "metric": "300+ Verified records"
+        },
+        {
+          "stepNumber": 2,
+          "title": "Standardization of Internship MoU Contracts",
+          "detail": "Authored the uniform legal agreement template for KR Internship Batch #4 outlining rights, duties, and data confidentiality clauses.",
+          "metric": "Zero contract error rate"
+        },
+        {
+          "stepNumber": 3,
+          "title": "Candidate Inquiries & Operations Support",
+          "detail": "Handled candidate questions, issued official acceptance letters, and managed daily shift scheduling across editorial and business desks.",
+          "metric": "Smooth cross-divisional flow"
+        },
+        {
+          "stepNumber": 4,
+          "title": "Best Intern Honor Recognition",
+          "detail": "Awarded the official Best Intern distinction in acknowledgment of consistent work ethic, discipline, and administrative workflow enhancements.",
+          "metric": "Best Intern Certificate 2026"
+        }
+      ],
+      "links": [
+        {
+          "title": "Standardized Internship MoU Document Template",
+          "url": "https://docs.google.com/document/d/example-mou-kr/view",
+          "category": "doc"
+        },
+        {
+          "title": "Best Intern Certificate - Kedaulatan Rakyat",
+          "url": "https://drive.google.com/file/d/example-best-intern-kr/view",
+          "category": "certificate"
+        }
+      ]
+    },
+    {
+      "id": "item-ecdc-head-internal",
+      "chapterId": "work-experience",
+      "title": "Head of Internal Human Resources",
+      "organization": "ECDC UPN \"Veteran\" Yogyakarta",
+      "role": "Head of Internal HR",
+      "period": "Feb - Dec 2025",
+      "location": "Yogyakarta",
+      "image": "https://images.unsplash.com/photo-1521737711867-e3b97375f902?auto=format&fit=crop&w=800&q=80",
+      "description": "Directed internal team bonding, discipline systems, and periodic performance reviews for 40+ committee members. Elevated member attendance and discipline by approximately 70%.",
+      "badges": [
+        "40+ Members Coordinated",
+        "~70% Discipline Surge",
+        "Measurable KPI Tracking"
+      ],
+      "steppingStones": [
+        {
+          "stepNumber": 1,
+          "title": "Attendance & Participation Tracking",
+          "detail": "Recorded and monitored attendance analytics for 40+ members across weekly coordination meetings and campus event rollouts.",
+          "metric": "Comprehensive attendance log"
+        },
+        {
+          "stepNumber": 2,
+          "title": "Interactive Member Engagement Initiatives",
+          "detail": "Initiated regular open forums, recognition shout-outs, and peer support sessions to resolve burnout and strengthen team cohesion.",
+          "metric": "~70% Discipline uplift"
+        },
+        {
+          "stepNumber": 3,
+          "title": "Individual Mentoring & Conflict Resolution",
+          "detail": "Conducted personal check-ins for members experiencing academic and organizational time constraints, sustaining high retention.",
+          "metric": "95% Member retention"
+        }
+      ],
+      "links": [
+        {
+          "title": "Internal Work Timeline & Master Schedule",
+          "url": "https://docs.google.com/spreadsheets/d/example-ecdc-timeline/view",
+          "category": "sheet"
+        }
+      ]
+    },
+    {
+      "id": "item-cert-bnsp-marketing",
+      "chapterId": "sertifikasi",
+      "title": "BNSP Certified Professional Marketer (Pemasaran)",
+      "organization": "Badan Nasional Sertifikasi Profesi (BNSP) Republic of Indonesia",
+      "role": "Certified Professional Marketer",
+      "period": "2024 - Officially Valid",
+      "location": "Indonesia",
+      "image": "https://images.unsplash.com/photo-1589829545856-d10d557cf95f?auto=format&fit=crop&w=800&q=80",
+      "description": "Official national certification verifying standardized competency in market research, persuasive communication, client relationship management, and strategic program delivery.",
+      "badges": [
+        "BNSP Republic of Indonesia",
+        "Reg TIK 2073 02543 2024",
+        "Status: Competent"
+      ],
+      "steppingStones": [
+        {
+          "stepNumber": 1,
+          "title": "SKKNI-Based Professional Training",
+          "detail": "Mastered national competence units under Indonesian National Work Standards (SKKNI) in target audience analysis and communication strategy.",
+          "metric": "SKKNI modules completed"
+        },
+        {
+          "stepNumber": 2,
+          "title": "Portfolio Compilation & Evidence Verification",
+          "detail": "Curated an evidence-backed portfolio documenting real operational projects, client reports, and professional case studies.",
+          "metric": "Assessment portfolio verified"
+        },
+        {
+          "stepNumber": 3,
+          "title": "Written Competency & Case Study Examination",
+          "detail": "Completed comprehensive technical exams on marketing methodology, professional business ethics, and operational problem-solving.",
+          "metric": "Passing score achieved"
+        },
+        {
+          "stepNumber": 4,
+          "title": "Oral Assessment & Live Scenario Defense",
+          "detail": "Defended practical scenarios in an intensive one-on-one evaluation with an accredited national BNSP assessor.",
+          "metric": "Competency verified live"
+        },
+        {
+          "stepNumber": 5,
+          "title": "Issuance of Official National Credential",
+          "detail": "Awarded full Competent status and officially issued Certificate No. 62090 2431 4 0004715 2024 with the Indonesian Garuda emblem.",
+          "metric": "Official certificate issued"
+        }
+      ],
+      "links": [
+        {
+          "title": "Official BNSP Credential Verification",
+          "url": "https://drive.google.com/file/d/example-bnsp-cert/view",
+          "category": "certificate"
+        }
+      ]
+    },
+    {
+      "id": "item-cert-ascend",
+      "chapterId": "sertifikasi",
+      "title": "ASCEND DWdG UNAIR 2026 Semifinalist Credential",
+      "organization": "Universitas Airlangga (UNAIR) & DWdG",
+      "role": "Semifinalist - Leadership & Social Innovation",
+      "period": "June 2026",
+      "location": "Surabaya",
+      "image": "https://images.unsplash.com/photo-1569683795645-b62e50fbf103?auto=format&fit=crop&w=800&q=80",
+      "description": "Certificate of achievement recognizing successful placement as a national semifinalist for innovative HR frameworks and youth career development models.",
+      "badges": [
+        "No. 094/DWDG/ASCEND/VI/2026",
+        "Leadership & Social Innovation"
+      ],
+      "steppingStones": [
+        {
+          "stepNumber": 1,
+          "title": "Initial Concept Drafting & Review",
+          "detail": "Formulated adaptive leadership models to address youth employment preparedness gaps in higher education.",
+          "metric": "Executive summary accepted"
+        },
+        {
+          "stepNumber": 2,
+          "title": "Comprehensive Strategy Deck Design",
+          "detail": "Crafted an evidence-backed visual presentation combining industry labor statistics with concrete implementation milestones.",
+          "metric": "Semifinalist deck finalized"
+        },
+        {
+          "stepNumber": 3,
+          "title": "Panel Evaluation & Live Presentation",
+          "detail": "Presented methodology to industry judges and defended actionable steps for talent capability building.",
+          "metric": "National Semifinalist Honors"
+        }
+      ],
+      "links": [
+        {
+          "title": "View ASCEND DWdG Credential",
+          "url": "https://drive.google.com/file/d/example-ascend-cert/view",
+          "category": "certificate"
+        }
+      ]
+    },
+    {
+      "id": "item-project-okr-system",
+      "chapterId": "project-leader",
+      "title": "Implementation of OKR System & Team Performance Monitoring",
+      "organization": "Growth Skill (PT Tumbuh Indonesia)",
+      "role": "Project Leader / Head of HRD",
+      "period": "Feb - Jun 2026",
+      "location": "Online / Jakarta",
+      "image": "https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=800&q=80",
+      "description": "Architected and deployed an Objectives and Key Results (OKR) performance tracking system to align HR team deliverables directly with overall corporate strategic targets.",
+      "badges": [
+        "11 HR Members Managed",
+        "Weekly OKR Framework",
+        "90% Stakeholder Rating"
+      ],
+      "steppingStones": [
+        {
+          "stepNumber": 1,
+          "title": "Operational Metric Gap Analysis",
+          "detail": "Reviewed legacy reporting bottlenecks that caused delayed reporting recaps and lack of individual KPI transparency.",
+          "metric": "Key operational gaps resolved"
+        },
+        {
+          "stepNumber": 2,
+          "title": "Automated OKR Tracking Spreadsheet Design",
+          "detail": "Engineered an automated Google Sheets master template with dynamic formulas tracking individual and team completion rates weekly.",
+          "metric": "Automated score calculations"
+        },
+        {
+          "stepNumber": 3,
+          "title": "Team Briefing & Technical Onboarding",
+          "detail": "Trained 11 HR members on submission standards, validation criteria, and prompt reporting workflows.",
+          "metric": "100% Team trained"
+        },
+        {
+          "stepNumber": 4,
+          "title": "Weekly Performance Reviews & Best Performer Honors",
+          "detail": "Conducted weekly sprint evaluation meetings and recognized top performers, achieving 95% on-time submission discipline.",
+          "metric": "95% On-time submission rate"
+        }
+      ],
+      "links": [
+        {
+          "title": "Access OKR System Master Template (Batch 6)",
+          "url": "https://docs.google.com/spreadsheets/d/example-okr-template/view",
+          "category": "sheet"
+        }
+      ]
+    },
+    {
+      "id": "item-project-mou-standardization",
+      "chapterId": "project-leader",
+      "title": "Internship MoU Template & Procedural Standardization",
+      "organization": "PT BP Kedaulatan Rakyat",
+      "role": "HR Administration Project Lead",
+      "period": "Feb - Apr 2026",
+      "location": "Yogyakarta",
+      "image": "https://images.unsplash.com/photo-1450133064473-71024230f91b?auto=format&fit=crop&w=800&q=80",
+      "description": "Spearheaded the standardization of internship administrative workflows through legally compliant MoU contracts, conduct guidelines, and centralized applicant tracking.",
+      "badges": [
+        "300+ Interns Processed",
+        "SOP Standardization",
+        "Zero Error Contract Rate"
+      ],
+      "steppingStones": [
+        {
+          "stepNumber": 1,
+          "title": "Audit of Historical Agreement Terms",
+          "detail": "Examined historical contract templates to clarify participant rights, corporate IP confidentiality, and operational expectations.",
+          "metric": "50+ Contract samples reviewed"
+        },
+        {
+          "stepNumber": 2,
+          "title": "Drafting Standardized MoU Batch #4",
+          "detail": "Created standardized legal contracts detailing assignment terms, data privacy requirements, and certification standards.",
+          "metric": "Uniform legal template approved"
+        },
+        {
+          "stepNumber": 3,
+          "title": "Divisional Alignment with Mentors",
+          "detail": "Aligned the contract guidelines with division supervisors to ensure smooth day-to-day onboarding and reporting.",
+          "metric": "Cross-divisional consensus"
+        },
+        {
+          "stepNumber": 4,
+          "title": "Centralized Digital Archiving",
+          "detail": "Issued standardized contracts to accepted candidates and archived digital copies in a centralized repository.",
+          "metric": "100% Formal contract compliance"
+        }
+      ],
+      "links": [
+        {
+          "title": "Standardized Internship MoU Document Template",
+          "url": "https://docs.google.com/document/d/example-mou-template/view",
+          "category": "doc"
+        }
+      ]
+    },
+    {
+      "id": "item-org-growth-skill-feed",
+      "chapterId": "organizational",
+      "title": "Divisional Leadership & Organization Management",
+      "organization": "Growth Skill PT Tumbuh Indonesia",
+      "role": "Head of HRD",
+      "period": "Mar - Jun 2026",
+      "location": "Indonesia",
+      "image": "https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?auto=format&fit=crop&w=800&q=80",
+      "description": "Directed divisional strategy, routine coordination meetings, cross-departmental alignment, and team morale to ensure successful program execution.",
+      "badges": [
+        "Best Head in 4 Months",
+        "11 HR Team Members",
+        "7+ Successful Programs"
+      ],
+      "steppingStones": [
+        {
+          "stepNumber": 1,
+          "title": "Strategic Kickoff & Target Allocation",
+          "detail": "Chaired initial divisional planning sessions to delineate responsibilities across programs for each HR team member.",
+          "metric": "Clear job descriptions agreed"
+        },
+        {
+          "stepNumber": 2,
+          "title": "Continuous Monthly Leadership Honors",
+          "detail": "Awarded Best Head in 4 Months across February, March, April, and May 2026 for high team productivity and morale.",
+          "metric": "4 Consecutive leadership awards"
+        }
+      ],
+      "links": [
+        {
+          "title": "Best Head in 4 Months Certificate",
+          "url": "https://drive.google.com/file/d/example-cert-4months/view",
+          "category": "certificate"
+        }
+      ]
+    },
+    {
+      "id": "item-org-sre-upnvyk",
+      "chapterId": "organizational",
+      "title": "Deputy Head of HR & Campus Event Coordination",
+      "organization": "Society of Renewable Energy (SRE) UPNVYK",
+      "role": "Deputy Head of HR",
+      "period": "Mar - Dec 2025",
+      "location": "Yogyakarta",
+      "image": "https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&w=800&q=80",
+      "description": "Maintained the active member database, coordinated annual recruitment intakes, and supported the operational execution of SRE Leadership Camp and Sportweek.",
+      "badges": [
+        "Member Database",
+        "Leadership Camp",
+        "Sportweek"
+      ],
+      "steppingStones": [
+        {
+          "stepNumber": 1,
+          "title": "SRE Member Database Administration",
+          "detail": "Centralized profiles, divisional placements, and active attendance records for all committee members into an official master sheet.",
+          "metric": "Centralized member database"
+        },
+        {
+          "stepNumber": 2,
+          "title": "Large-Scale Campus Event Logistics",
+          "detail": "Managed committee attendance, participant verification, and logistical needs for major university-wide events.",
+          "metric": "Seamless event timeline execution"
+        }
+      ],
+      "links": [
+        {
+          "title": "SRE Member Database (2025/2026)",
+          "url": "https://docs.google.com/spreadsheets/d/example-sre-data/view",
+          "category": "sheet"
+        }
+      ]
+    },
+    {
+      "id": "item-gcfow-committee",
+      "chapterId": "others",
+      "title": "Global Competence Future of Work (GCFoW) 2025",
+      "organization": "UPN \"Veteran\" Yogyakarta & P2A Secretariat",
+      "role": "Staff Event Committee",
+      "period": "1 - 12 September 2025",
+      "location": "Yogyakarta",
+      "image": "https://images.unsplash.com/photo-1540575467063-178a50c2df87?auto=format&fit=crop&w=800&q=80",
+      "description": "Served as organizing committee for an international conference bringing together global speakers under the theme 'Empowering Future-Ready Youth: Navigating AI, Climate Challenges, and a Hyperconnected World'.",
+      "badges": [
+        "International Summit",
+        "Event Committee Staff",
+        "Certificate No. P2A2025BX10160"
+      ],
+      "steppingStones": [
+        {
+          "stepNumber": 1,
+          "title": "International Speaker Liaison & Coordination",
+          "detail": "Facilitated communications with foreign guest speakers, confirmed presentation schedules, and coordinated technical session requirements.",
+          "metric": "High international speaker rating"
+        },
+        {
+          "stepNumber": 2,
+          "title": "Multi-Day Conference Logistics Management",
+          "detail": "Supported panel sessions, interactive workshops, and international youth competitions across the 12-day summit.",
+          "metric": "Active multinational delegation"
+        }
+      ],
+      "links": [
+        {
+          "title": "GCFoW 2025 Committee Certificate",
+          "url": "https://drive.google.com/file/d/example-gcfow-cert/view",
+          "category": "certificate"
+        }
+      ]
+    },
+    {
+      "id": "item-oia-support",
+      "chapterId": "others",
+      "title": "Project & Event Support at Office of International Affairs (OIA)",
+      "organization": "Office of International Affairs (OIA) UPN \"Veteran\" Yogyakarta",
+      "role": "Event Support & Liaison Staff",
+      "period": "Jun - Dec 2025",
+      "location": "Yogyakarta",
+      "image": "https://images.unsplash.com/photo-1511578314322-379afb476865?auto=format&fit=crop&w=800&q=80",
+      "description": "Supported international campus partnership programs through external communications, event logistical prep, speaker coordination, and foreign exchange student administration.",
+      "badges": [
+        "International Liaison",
+        "Delegation Management",
+        "Event Operations"
+      ],
+      "steppingStones": [
+        {
+          "stepNumber": 1,
+          "title": "International Delegation Briefings & Logistics",
+          "detail": "Prepared orientation information sheets and technical guidelines for visiting exchange students and academic delegations.",
+          "metric": "Prompt response during office hours"
+        },
+        {
+          "stepNumber": 2,
+          "title": "Event Administration & Archiving",
+          "detail": "Compiled thorough post-event administrative reports, attendance records, and media logs for university archives.",
+          "metric": "On-time administrative filing"
+        }
+      ],
+      "links": [
+        {
+          "title": "OIA Program Documentation Archive",
+          "url": "https://drive.google.com/drive/folders/example-oia-docs",
+          "category": "drive"
+        }
+      ]
+    }
+  ],
+  "frontlineExperience": {
+    "title": "Work Experience",
+    "subtitle": "Translating frontline service and hospitality experience into practical perspectives on workload management, SOP discipline, and cross-team communication.",
+    "pillars": [
+      {
+        "aspect": "Time & Workload Management",
+        "description": "Maintaining composure and operational speed under high-pressure, shift-based peak service environments."
+      },
+      {
+        "aspect": "SOP Compliance & Pace",
+        "description": "Strict adherence to hygiene, cash handling, and customer satisfaction standards with zero compromise on quality."
+      },
+      {
+        "aspect": "Cross-Functional Communication",
+        "description": "Clear verbal handoffs, shift synchronization, and task prioritization between front-of-house and back-of-house teams."
+      }
+    ],
+    "industryPlacements": [
+      {
+        "name": "Seropea Coffee & Dine",
+        "role": "Service & Frontline Operations",
+        "focus": "Customer service, inventory reconciliation, POS cashier balancing, SOP compliance"
+      },
+      {
+        "name": "Mookury Milk & Dessert",
+        "role": "Frontline Service Staff",
+        "focus": "High-speed customer fulfillment, product handling, and team collaboration"
+      },
+      {
+        "name": "Seika Greenery & Eatery",
+        "role": "Operational Staff",
+        "focus": "Quality control, shift synchronization, order accuracy, and hospitality care"
+      },
+      {
+        "name": "KDH Rooftop Bantul",
+        "role": "Event & Hospitality Crew",
+        "focus": "Rush-hour crowd management, communication, and time management"
+      },
+      {
+        "name": "Co-Working Space KOPMA UGM",
+        "role": "Space Operations & Frontline Support",
+        "focus": "Member check-in, facility readiness, administrative records, and client assistance"
+      }
+    ],
+    "industryPlacemats": []
+  }
+}

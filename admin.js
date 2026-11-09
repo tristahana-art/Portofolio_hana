@@ -1011,59 +1011,105 @@
     }
   }
 
-  function processImageFile(file, type) {
+  // --------------------------------------------------------------------------
+  // Client-Side Image Compression & Upload Processing
+  // --------------------------------------------------------------------------
+  function compressImage(file, maxDimension = 1200, quality = 0.85) {
+    return new Promise(resolve => {
+      const reader = new FileReader();
+      reader.onload = e => {
+        const img = new Image();
+        img.onload = () => {
+          let w = img.width;
+          let h = img.height;
+          if (w > maxDimension || h > maxDimension) {
+            if (w > h) {
+              h = Math.round((h * maxDimension) / w);
+              w = maxDimension;
+            } else {
+              w = Math.round((w * maxDimension) / h);
+              h = maxDimension;
+            }
+          }
+          const canvas = document.createElement('canvas');
+          canvas.width = w;
+          canvas.height = h;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, w, h);
+          const dataUrl = canvas.toDataURL('image/jpeg', quality);
+          resolve(dataUrl);
+        };
+        img.onerror = () => resolve(e.target.result);
+        img.src = e.target.result;
+      };
+      reader.onerror = () => resolve(null);
+      reader.readAsDataURL(file);
+    });
+  }
+
+  async function processImageFile(file, type) {
     if (!file || !file.type.startsWith('image/')) {
-      showToast('File harus berupa gambar (JPG, PNG, WEBP).', 'error');
+      showToast('Please select a valid image file (JPG, PNG, WEBP).', 'error');
       return;
     }
 
-    const reader = new FileReader();
-    reader.onload = async function (e) {
-      const b64 = e.target.result;
+    const isAvatar = (type === 'avatar');
+    const previewBox = document.getElementById(isAvatar ? 'avatar-preview-box' : 'item-preview-box');
+    const previewImg = document.getElementById(isAvatar ? 'avatar-preview-img' : 'item-preview-img');
+    const statusSpan = document.getElementById(isAvatar ? 'avatar-preview-status' : 'item-preview-status');
 
-      if (type === 'avatar') {
-        const previewBox = document.getElementById('avatar-preview-box');
-        const previewImg = document.getElementById('avatar-preview-img');
-        const statusSpan = document.getElementById('avatar-preview-status');
-        if (previewImg) previewImg.src = b64;
-        if (previewBox) previewBox.style.display = 'flex';
+    if (statusSpan) {
+      statusSpan.textContent = 'Processing & optimizing photo...';
+      statusSpan.style.color = 'var(--blue-light)';
+    }
 
-        if (isServerActive) {
-          if (statusSpan) statusSpan.textContent = 'Uploading to server...';
-          const srvUrl = await uploadToServer(file.name, b64);
-          if (srvUrl) {
-            pendingAvatarPhoto = srvUrl;
-            setVal('cov-avatar-url', srvUrl);
-            if (statusSpan) statusSpan.textContent = '✓ Saved in uploads/ folder';
-            showToast('Profile photo saved to server.', 'success');
-            return;
-          }
-        }
-        pendingAvatarPhoto = b64;
-        showToast('Profile photo ready to save.', 'success');
-      } else {
-        const previewBox = document.getElementById('item-preview-box');
-        const previewImg = document.getElementById('item-preview-img');
-        const statusSpan = document.getElementById('item-preview-status');
-        if (previewImg) previewImg.src = b64;
-        if (previewBox) previewBox.style.display = 'flex';
-
-        if (isServerActive) {
-          if (statusSpan) statusSpan.textContent = 'Uploading to server...';
-          const srvUrl = await uploadToServer(file.name, b64);
-          if (srvUrl) {
-            pendingItemPhoto = srvUrl;
-            setVal('item-form-image-url', srvUrl);
-            if (statusSpan) statusSpan.textContent = '✓ Saved in uploads/ folder';
-            showToast('Project photo saved to server.', 'success');
-            return;
-          }
-        }
-        pendingItemPhoto = b64;
-        showToast('Project photo ready to save.', 'success');
+    // Compress client-side to max 1200px at 85% quality (~100-200KB)
+    const compressedB64 = await compressImage(file, 1200, 0.85) || '';
+    if (!compressedB64) {
+      if (statusSpan) {
+        statusSpan.textContent = 'Failed to process image.';
+        statusSpan.style.color = '#EF4444';
       }
-    };
-    reader.readAsDataURL(file);
+      return;
+    }
+
+    if (previewImg) previewImg.src = compressedB64;
+    if (previewBox) previewBox.style.display = 'flex';
+
+    if (isServerActive) {
+      if (statusSpan) {
+        statusSpan.textContent = 'Uploading to server...';
+        statusSpan.style.color = 'var(--blue-light)';
+      }
+      const srvUrl = await uploadToServer(file.name, compressedB64);
+      if (srvUrl) {
+        if (isAvatar) {
+          pendingAvatarPhoto = srvUrl;
+          setVal('cov-avatar-url', srvUrl);
+        } else {
+          pendingItemPhoto = srvUrl;
+          setVal('item-form-image-url', srvUrl);
+        }
+        if (statusSpan) {
+          statusSpan.textContent = '✓ Saved in uploads/ folder';
+          statusSpan.style.color = 'var(--status-success)';
+        }
+        showToast('Photo saved to server successfully.', 'success');
+        return;
+      }
+    }
+
+    // Fallback: ready to save as optimized base64
+    if (isAvatar) {
+      pendingAvatarPhoto = compressedB64;
+    } else {
+      pendingItemPhoto = compressedB64;
+    }
+    if (statusSpan) {
+      statusSpan.textContent = '✓ Photo optimized & ready to save';
+      statusSpan.style.color = 'var(--status-success)';
+    }
+    showToast('Photo optimized and ready to save.', 'success');
   }
 
   async function uploadToServer(filename, dataUri) {

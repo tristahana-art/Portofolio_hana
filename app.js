@@ -96,9 +96,9 @@
   // Data Loading
   // --------------------------------------------------------------------------
   async function loadData() {
-    // 1. Try backend server
+    // 1. Try backend server with cache-busting timestamp
     try {
-      const response = await fetch('/api/data', { cache: 'no-store' });
+      const response = await fetch('/api/data?t=' + Date.now(), { cache: 'no-store' });
       if (response.ok) {
         portfolioData = await response.json();
         localStorage.setItem('trista_portfolio_data', JSON.stringify(portfolioData));
@@ -121,7 +121,7 @@
 
     // 3. Fallback to bundled data/portfolio.json
     try {
-      const fallbackResp = await fetch('data/portfolio.json');
+      const fallbackResp = await fetch('data/portfolio.json?t=' + Date.now());
       if (fallbackResp.ok) {
         portfolioData = await fallbackResp.json();
         localStorage.setItem('trista_portfolio_data', JSON.stringify(portfolioData));
@@ -284,9 +284,9 @@
     
     // Gather defined chapters
     const chapters = [...(portfolioData.chapters || [])];
+    const items = portfolioData.items || [];
     
     // Auto-discover any custom-typed chapters from items that are not in the chapters list
-    const items = portfolioData.items || [];
     items.forEach(it => {
       if (!it.chapterId) return;
       const exists = chapters.some(ch => 
@@ -303,13 +303,34 @@
       }
     });
 
+    // Helper to count items in chapter
+    function countForChapter(ch) {
+      return items.filter(it => {
+        if (!it.chapterId) return false;
+        if (it.chapterId === ch.id) return true;
+        if (it.chapterId.toLowerCase().trim() === ch.title.toLowerCase().trim()) return true;
+        if (it.chapterId.toLowerCase().trim() === ch.id.toLowerCase().trim()) return true;
+        return false;
+      }).length;
+    }
+
+    // If current activeChapter has 0 items, auto-select the first chapter with > 0 items
+    const activeObj = chapters.find(c => c.id === activeChapterId);
+    if (!activeObj || countForChapter(activeObj) === 0) {
+      const firstWithItems = chapters.find(c => countForChapter(c) > 0);
+      if (firstWithItems) {
+        activeChapterId = firstWithItems.id;
+      }
+    }
+
     chapters.forEach(ch => {
+      const count = countForChapter(ch);
       const btn = document.createElement('button');
       btn.className = `chapter-tab-btn ${ch.id === activeChapterId ? 'active' : ''}`;
       btn.setAttribute('data-chapter-id', ch.id);
       btn.innerHTML = `
         <span class="tab-num">${escapeHtml(ch.number)}</span>
-        <span class="tab-text">${escapeHtml(ch.title)}</span>
+        <span class="tab-text">${escapeHtml(ch.title)} <small style="opacity: 0.65; font-size: 0.78em;">(${count})</small></span>
       `;
       btn.addEventListener('click', () => {
         activeChapterId = ch.id;

@@ -1,32 +1,40 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Pusat Kendali Portofolio | Backend CMS Trista Hana</title>
-  <link rel="stylesheet" href="styles.css">
+  <title>CMS Dashboard | Trista Hana Portfolio</title>
+  <link rel="stylesheet" href="styles.css?v=2.2">
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%232563EB'/><text x='50%' y='55%' dominant-baseline='middle' text-anchor='middle' font-family='Montserrat' font-size='50' font-weight='800' fill='white'>TH</text></svg>">
   <style>
-    /* CMS Dashboard Specific Styles */
+    /* Admin CMS Custom Styling */
     body {
-      background-color: #05070B;
+      background-color: var(--bg-primary);
+      color: var(--text-primary);
+      min-height: 100vh;
+      overflow-x: hidden;
     }
     .cms-layout {
       display: grid;
       grid-template-columns: 280px 1fr;
       min-height: 100vh;
     }
+    @media (max-width: 992px) {
+      .cms-layout {
+        grid-template-columns: 1fr;
+      }
+    }
     .cms-sidebar {
       background-color: var(--bg-surface);
-      border-right: 1px solid var(--border-subtle);
-      padding: 1.5rem;
+      border-right: 1px solid var(--border-medium);
+      padding: 1.5rem 1.25rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
       position: sticky;
       top: 0;
       height: 100vh;
       overflow-y: auto;
-      display: flex;
-      flex-direction: column;
-      gap: 1.5rem;
     }
     .cms-brand {
       display: flex;
@@ -44,70 +52,132 @@
     .cms-nav-item button {
       width: 100%;
       text-align: left;
-      padding: 0.75rem 1rem;
+      padding: 0.7rem 1rem;
+      background: transparent;
+      border: 1px solid transparent;
       border-radius: var(--radius-sm);
       color: var(--text-secondary);
-      font-size: 0.825rem;
+      font-size: 0.88rem;
       font-weight: 600;
       display: flex;
       align-items: center;
       gap: 0.75rem;
+      cursor: pointer;
       transition: var(--transition);
-      border: 1px solid transparent;
     }
     .cms-nav-item button:hover {
       background-color: var(--bg-elevated);
       color: var(--text-primary);
     }
     .cms-nav-item button.active {
-      background-color: var(--blue-primary);
-      color: #FFFFFF;
-      border-color: var(--blue-primary);
+      background-color: rgba(37, 99, 235, 0.15);
+      border-color: rgba(59, 130, 246, 0.3);
+      color: var(--blue-light);
     }
     .cms-main {
       padding: 2.5rem 3rem;
-      max-width: 1100px;
-      margin: 0 auto;
-      width: 100%;
+      max-width: 1200px;
+    }
+    @media (max-width: 768px) {
+      .cms-main {
+        padding: 1.5rem 1rem;
+      }
     }
     .cms-topbar {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 2.5rem;
-      padding-bottom: 1.5rem;
+      margin-bottom: 2rem;
+      padding-bottom: 1.25rem;
       border-bottom: 1px solid var(--border-subtle);
       flex-wrap: wrap;
       gap: 1rem;
     }
     .cms-panel-card {
       background-color: var(--bg-surface);
-      border: 1px solid var(--border-subtle);
-      border-radius: var(--radius-sm);
-      padding: 2rem;
+      border: 1px solid var(--border-medium);
+      border-radius: var(--radius-md);
+      padding: 1.75rem;
       margin-bottom: 2rem;
     }
     .cms-card-title {
-      font-size: 1.25rem;
+      font-size: 1.2rem;
       font-weight: 700;
       color: var(--text-primary);
       margin-bottom: 0.5rem;
     }
     .cms-card-desc {
       font-size: 0.85rem;
-      color: var(--text-muted);
-      margin-bottom: 1.75rem;
-      line-height: 1.5;
+      color: var(--text-secondary);
+      margin-bottom: 1.5rem;
     }
-    .order-item-row {
+    .admin-items-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.88rem;
+    }
+    .admin-items-table th,
+    .admin-items-table td {
+      padding: 1rem 0.85rem;
+      text-align: left;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+    .admin-items-table th {
+      color: var(--text-muted);
+      font-weight: 600;
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .admin-items-table tr:hover td {
+      background-color: rgba(255, 255, 255, 0.02);
+    }
+    .admin-action-btn-group {
+      display: flex;
+      gap: 0.5rem;
+    }
+    .upload-dropzone {
+      border: 2px dashed var(--border-medium);
+      border-radius: var(--radius-sm);
+      padding: 1.5rem;
+      text-align: center;
+      background-color: var(--bg-elevated);
+      cursor: pointer;
+      transition: var(--transition);
+    }
+    .upload-dropzone:hover,
+    .upload-dropzone.dragover {
+      border-color: var(--blue-primary);
+      background-color: rgba(37, 99, 235, 0.05);
+    }
+    .upload-icon {
+      color: var(--blue-light);
+      margin-bottom: 0.5rem;
+    }
+    .upload-instruction {
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+    }
+    .upload-hint {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      margin-top: 0.25rem;
+    }
+    .image-preview-wrapper {
+      margin-top: 1rem;
       display: flex;
       align-items: center;
-      justify-content: space-between;
-      padding: 0.85rem 1.25rem;
-      background-color: var(--bg-elevated);
-      border: 1px solid var(--border-subtle);
+      gap: 1rem;
+      background-color: var(--bg-surface);
+      padding: 0.75rem 1rem;
       border-radius: var(--radius-sm);
-      margin-bottom: 0.65rem;
+      border: 1px solid var(--border-subtle);
+    }
+    .image-preview-thumb {
+      width: 60px;
+      height: 60px;
+      object-fit: cover;
+      border-radius: var(--radius-sm);
     }
     .tag-bubble-list {
       display: flex;
@@ -153,32 +223,32 @@
       <div class="cms-brand">
         <div class="brand-badge">TH</div>
         <div>
-          <div style="font-weight: 700; font-size: 0.95rem; color: var(--text-primary);">Pengaturan Portofolio</div>
-          <div style="font-size: 0.75rem; color: var(--text-muted);">Pusat Kendali Konten &amp; Layout</div>
+          <div style="font-weight: 700; font-size: 0.95rem; color: var(--text-primary);">Portfolio Settings</div>
+          <div style="font-size: 0.75rem; color: var(--text-muted);">Content &amp; Layout CMS</div>
         </div>
       </div>
 
       <nav>
         <ul class="cms-nav-list">
-          <li class="cms-nav-item"><button class="active" data-view="view-layout">🔀 Tata Letak &amp; Urutan</button></li>
-          <li class="cms-nav-item"><button data-view="view-cover">👤 Cover &amp; Identitas</button></li>
-          <li class="cms-nav-item"><button data-view="view-intro">💬 Intro &amp; Sambutan</button></li>
-          <li class="cms-nav-item"><button data-view="view-profile">🎓 Profil &amp; Akademik</button></li>
-          <li class="cms-nav-item"><button data-view="view-metrics">📊 Metrik Utama</button></li>
-          <li class="cms-nav-item"><button data-view="view-chapters">📑 Kelola Bab</button></li>
-          <li class="cms-nav-item"><button data-view="view-items">💼 Item Portofolio</button></li>
+          <li class="cms-nav-item"><button class="active" data-view="view-layout">🔀 Layout &amp; Order</button></li>
+          <li class="cms-nav-item"><button data-view="view-cover">👤 Cover &amp; Identity</button></li>
+          <li class="cms-nav-item"><button data-view="view-intro">💬 Intro &amp; Welcome</button></li>
+          <li class="cms-nav-item"><button data-view="view-profile">🎓 Profile &amp; Academics</button></li>
+          <li class="cms-nav-item"><button data-view="view-metrics">📊 Key Metrics</button></li>
+          <li class="cms-nav-item"><button data-view="view-chapters">📑 Manage Chapters</button></li>
+          <li class="cms-nav-item"><button data-view="view-items">💼 Portfolio Items</button></li>
           <li class="cms-nav-item"><button data-view="view-frontline">💼 Work Experience</button></li>
-          <li class="cms-nav-item"><button data-view="view-contact">📬 Saluran Kontak</button></li>
-          <li class="cms-nav-item"><button data-view="view-backup">💾 Cadangan &amp; Database</button></li>
+          <li class="cms-nav-item"><button data-view="view-contact">📬 Contact Channels</button></li>
+          <li class="cms-nav-item"><button data-view="view-backup">💾 Backup &amp; Database</button></li>
         </ul>
       </nav>
 
       <div style="margin-top: auto; padding-top: 1rem; border-top: 1px solid var(--border-subtle);">
         <div id="cms-server-indicator" style="font-size: 0.75rem; color: var(--status-success); font-weight: 600; margin-bottom: 0.75rem;">
-          ● Server Aktif (Port 3000)
+          ● Server Connected
         </div>
         <a href="/" target="_blank" class="btn btn-outline btn-sm" style="width: 100%;">
-          <span>Buka Web Portofolio</span>
+          <span>View Public Portfolio</span>
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
         </a>
       </div>
@@ -188,25 +258,25 @@
     <main class="cms-main">
       <div class="cms-topbar">
         <div>
-          <h1 style="font-size: 1.5rem; font-weight: 800;" id="cms-current-view-title">Tata Letak &amp; Urutan Bagian</h1>
-          <p style="color: var(--text-secondary); font-size: 0.85rem;">Sesuaikan seluruh teks, alur, foto, tautan, dan urutan tampilan sesuka hati.</p>
+          <h1 style="font-size: 1.5rem; font-weight: 800;" id="cms-current-view-title">Layout &amp; Section Order</h1>
+          <p style="color: var(--text-secondary); font-size: 0.85rem;">Customize all texts, layout flow, project photos, clickable links, and display order.</p>
         </div>
         <div style="display: flex; gap: 0.75rem;">
           <button id="cms-btn-save-all" class="btn btn-primary">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
-            <span>Simpan Perubahan</span>
+            <span>Save All Changes</span>
           </button>
         </div>
       </div>
 
       <!-- =====================================================================
-           VIEW 1: Tata Letak & Urutan Bagian
+           VIEW 1: Layout & Section Order
            ===================================================================== -->
       <section id="view-layout" class="section-view active">
         <div class="cms-panel-card">
-          <h2 class="cms-card-title">Urutan &amp; Visibilitas Bagian Halaman</h2>
+          <h2 class="cms-card-title">Section Order &amp; Page Visibility</h2>
           <p class="cms-card-desc">
-            Anda dapat menyembunyikan atau menampilkan bagian tertentu, serta memindahkan urutan bagian (Naik / Turun) sesuai preferensi penyajian yang Anda inginkan.
+            Toggle visibility or reorder any section (Move Up / Down) to tailor how recruiters experience your portfolio.
           </p>
 
           <div id="layout-sections-list">
@@ -216,152 +286,152 @@
       </section>
 
       <!-- =====================================================================
-           VIEW 2: Cover & Identitas
+           VIEW 2: Cover & Identity
            ===================================================================== -->
       <section id="view-cover" class="section-view">
         <div class="cms-panel-card">
-          <h2 class="cms-card-title">Bagian 01: Cover &amp; Identitas Utama</h2>
-          <p class="cms-card-desc">Ubah nama, status lamaran, judul spesialisasi, kata kunci HR, dan foto utama.</p>
+          <h2 class="cms-card-title">Section 01: Cover &amp; Core Identity</h2>
+          <p class="cms-card-desc">Update your full name, availability status pill, headline, HR keywords, and primary avatar.</p>
 
           <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
             <div class="form-group">
-              <label class="form-label" for="cov-name">Nama Lengkap</label>
+              <label class="form-label" for="cov-name">Full Name</label>
               <input type="text" id="cov-name" class="form-control" required>
             </div>
             <div class="form-group">
-              <label class="form-label" for="cov-status">Teks Status Pil</label>
+              <label class="form-label" for="cov-status">Status Pill Text</label>
               <input type="text" id="cov-status" class="form-control" placeholder="Available for Internship & Full-time Roles">
             </div>
           </div>
 
           <div class="form-group">
-            <label class="form-label" for="cov-title">Judul Posisi / Headline</label>
+            <label class="form-label" for="cov-title">Position Title / Headline</label>
             <input type="text" id="cov-title" class="form-control" placeholder="Project Operation & HR Candidate Portfolio">
           </div>
 
           <div class="form-group">
-            <label class="form-label" for="cov-summary">Ringkasan Eksekutif (Bio Singkat)</label>
+            <label class="form-label" for="cov-summary">Executive Summary (Short Bio)</label>
             <textarea id="cov-summary" class="form-control" rows="4"></textarea>
           </div>
 
           <div class="form-group">
-            <label class="form-label" for="cov-keywords">Kata Kunci HR (Pisahkan dengan koma)</label>
-            <input type="text" id="cov-keywords" class="form-control" placeholder="Talent Acquisition, SOP Standardization, OKR Tracking, dll.">
+            <label class="form-label" for="cov-keywords">HR Keywords (Comma-separated)</label>
+            <input type="text" id="cov-keywords" class="form-control" placeholder="Talent Acquisition, SOP Standardization, OKR Tracking, etc.">
           </div>
 
           <!-- Avatar Uploader -->
           <div class="form-group" style="background-color: var(--bg-elevated); padding: 1.25rem; border-radius: var(--radius-sm); border: 1px solid var(--border-subtle);">
-            <label class="form-label">Foto Profil Formal</label>
+            <label class="form-label">Formal Profile Photo</label>
             <div class="upload-dropzone" id="avatar-dropzone">
               <svg class="upload-icon" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M6 21v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2"/></svg>
-              <div class="upload-instruction">Tarik &amp; lepas foto baru di sini, atau klik untuk memilih</div>
+              <div class="upload-instruction">Drag &amp; drop a new photo here, or click to browse</div>
               <input type="file" id="avatar-file-input" accept="image/*" style="display: none;">
             </div>
             <div style="margin-top: 0.75rem;">
-              <label class="form-label" style="font-size: 0.75rem; color: var(--text-muted);" for="cov-avatar-url">Atau gunakan URL Foto:</label>
+              <label class="form-label" style="font-size: 0.75rem; color: var(--text-muted);" for="cov-avatar-url">Or use an Image URL:</label>
               <input type="url" id="cov-avatar-url" class="form-control" placeholder="https://...">
             </div>
             <div class="image-preview-wrapper" id="avatar-preview-box" style="display: none;">
               <img id="avatar-preview-img" class="image-preview-thumb" src="" alt="Avatar Preview">
-              <span id="avatar-preview-status" style="font-size: 0.8rem; color: var(--status-success);">Foto siap diperbarui</span>
+              <span id="avatar-preview-status" style="font-size: 0.8rem; color: var(--status-success);">Photo ready to save</span>
             </div>
           </div>
         </div>
       </section>
 
       <!-- =====================================================================
-           VIEW 3: Intro & Sambutan
+           VIEW 3: Intro & Welcome
            ===================================================================== -->
       <section id="view-intro" class="section-view">
         <div class="cms-panel-card">
-          <h2 class="cms-card-title">Bagian 02: Intro &amp; Sambutan Rekruter</h2>
-          <p class="cms-card-desc">Sesuaikan teks pesan awal (Congratulations / Salam Rekruter) dan kutipan visi.</p>
+          <h2 class="cms-card-title">Section 02: Intro &amp; Recruiter Welcome Note</h2>
+          <p class="cms-card-desc">Customize the opening greeting note and the operational vision quote.</p>
 
           <div class="form-group">
-            <label class="form-label" for="intro-greeting">Isi Sambutan Utama</label>
+            <label class="form-label" for="intro-greeting">Welcome Message Body</label>
             <textarea id="intro-greeting" class="form-control" rows="5"></textarea>
           </div>
 
           <div class="form-group">
-            <label class="form-label" for="intro-quote">Kutipan Sorotan Operasional</label>
+            <label class="form-label" for="intro-quote">Operational Vision Pitch Quote</label>
             <input type="text" id="intro-quote" class="form-control">
           </div>
         </div>
       </section>
 
       <!-- =====================================================================
-           VIEW 4: Profil & Akademik
+           VIEW 4: Profile & Academics
            ===================================================================== -->
       <section id="view-profile" class="section-view">
         <div class="cms-panel-card">
-          <h2 class="cms-card-title">Bagian 03: Profil Akademik &amp; Kompetensi</h2>
-          <p class="cms-card-desc">Ubah rincian kampus, IPK, SKS, asal SMA, serta daftar keahlian dan mata kuliah.</p>
+          <h2 class="cms-card-title">Section 03: Academic Profile &amp; Competencies</h2>
+          <p class="cms-card-desc">Update university credentials, GPA, completed credits, high school, skills, and coursework.</p>
 
           <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem;">
             <div class="form-group">
-              <label class="form-label" for="prof-gpa">IPK Kumulatif (GPA)</label>
+              <label class="form-label" for="prof-gpa">Cumulative GPA</label>
               <input type="text" id="prof-gpa" class="form-control" placeholder="3.88 / 4.00">
             </div>
             <div class="form-group">
-              <label class="form-label" for="prof-credits">Total SKS Diambil</label>
-              <input type="text" id="prof-credits" class="form-control" placeholder="84 SKS">
+              <label class="form-label" for="prof-credits">Credits Completed</label>
+              <input type="text" id="prof-credits" class="form-control" placeholder="84 Credits">
             </div>
             <div class="form-group">
-              <label class="form-label" for="prof-cohort">Angkatan Kuliah</label>
-              <input type="text" id="prof-cohort" class="form-control" placeholder="2023 - Sekarang">
+              <label class="form-label" for="prof-cohort">Cohort / Class Year</label>
+              <input type="text" id="prof-cohort" class="form-control" placeholder="2023 - Present">
             </div>
           </div>
 
           <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
             <div class="form-group">
-              <label class="form-label" for="prof-univ">Nama Universitas</label>
+              <label class="form-label" for="prof-univ">University Name</label>
               <input type="text" id="prof-univ" class="form-control">
             </div>
             <div class="form-group">
-              <label class="form-label" for="prof-major">Jurusan / Program Studi</label>
+              <label class="form-label" for="prof-major">Degree &amp; Major</label>
               <input type="text" id="prof-major" class="form-control">
             </div>
           </div>
 
           <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
             <div class="form-group">
-              <label class="form-label" for="prof-school">Asal SMA</label>
+              <label class="form-label" for="prof-school">High School</label>
               <input type="text" id="prof-school" class="form-control">
             </div>
             <div class="form-group">
-              <label class="form-label" for="prof-loc">Lokasi Domisili</label>
+              <label class="form-label" for="prof-loc">Location</label>
               <input type="text" id="prof-loc" class="form-control">
             </div>
           </div>
 
           <div class="form-group">
-            <label class="form-label" for="prof-skills-input">Keahlian HR (Pisahkan dengan koma)</label>
+            <label class="form-label" for="prof-skills-input">Related HR Skills (Comma-separated)</label>
             <textarea id="prof-skills-input" class="form-control" rows="3"></textarea>
           </div>
 
           <div class="form-group">
-            <label class="form-label" for="prof-courses-input">Mata Kuliah Relevan (Pisahkan dengan koma)</label>
+            <label class="form-label" for="prof-courses-input">Related Courses Taken (Comma-separated)</label>
             <textarea id="prof-courses-input" class="form-control" rows="3"></textarea>
           </div>
 
           <div class="form-group">
-            <label class="form-label" for="prof-tools-input">Alat Kerja &amp; Hard Skills (Pisahkan dengan koma)</label>
+            <label class="form-label" for="prof-tools-input">Work Tools &amp; Hard Skills (Comma-separated)</label>
             <textarea id="prof-tools-input" class="form-control" rows="3"></textarea>
           </div>
         </div>
       </section>
 
       <!-- =====================================================================
-           VIEW 5: Metrik Utama
+           VIEW 5: Key Metrics
            ===================================================================== -->
       <section id="view-metrics" class="section-view">
         <div class="cms-panel-card">
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
             <div>
-              <h2 class="cms-card-title">Bilah Metrik Dampak</h2>
-              <p class="cms-card-desc">Angka pencapaian terukur yang ditampilkan di bilah beranda portofolio.</p>
+              <h2 class="cms-card-title">Impact Metrics Strip</h2>
+              <p class="cms-card-desc">Quantified achievements displayed on the portfolio homepage metric strip.</p>
             </div>
-            <button type="button" id="btn-add-metric-row" class="btn btn-outline btn-sm">+ Tambah Kartu Metrik</button>
+            <button type="button" id="btn-add-metric-row" class="btn btn-outline btn-sm">+ Add Metric Card</button>
           </div>
 
           <div id="metrics-editor-list" style="display: flex; flex-direction: column; gap: 1rem;">
@@ -371,16 +441,19 @@
       </section>
 
       <!-- =====================================================================
-           VIEW 6: Kelola Bab Pengalaman (Chapters)
+           VIEW 6: Manage Chapters
            ===================================================================== -->
       <section id="view-chapters" class="section-view">
         <div class="cms-panel-card">
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; gap: 0.5rem;">
             <div>
-              <h2 class="cms-card-title">Kelola Bab Pengalaman</h2>
-              <p class="cms-card-desc">Ubah nomor bab, nama bab, dan deskripsi singkat kategori pengalaman.</p>
+              <h2 class="cms-card-title">Manage Experience Chapters</h2>
+              <p class="cms-card-desc">Update chapter numbers, titles, and short category descriptions.</p>
             </div>
-            <button type="button" id="btn-add-chapter-row" class="btn btn-outline btn-sm">+ Tambah Bab Baru</button>
+            <div style="display: flex; gap: 0.5rem;">
+              <button type="button" id="btn-reset-default-chapters" class="btn btn-outline btn-sm" style="color: var(--blue-light); border-color: rgba(59, 130, 246, 0.4);">↺ Restore Default 6 Chapters</button>
+              <button type="button" id="btn-add-chapter-row" class="btn btn-primary btn-sm">+ Add New Chapter</button>
+            </div>
           </div>
 
           <div id="chapters-editor-list" style="display: flex; flex-direction: column; gap: 1rem;">
@@ -390,18 +463,18 @@
       </section>
 
       <!-- =====================================================================
-           VIEW 7: Item Portofolio (Upload Foto, Link, Detail)
+           VIEW 7: Portfolio Items (Photos, Links, Stepping Stones)
            ===================================================================== -->
       <section id="view-items" class="section-view">
         <div class="cms-panel-card">
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 0.5rem;">
             <div>
-              <h2 class="cms-card-title">Daftar Portofolio &amp; Proyek</h2>
-              <p class="cms-card-desc">Kelola dokumen, alur stepping stones, foto, dan link tautan Google Drive / Sheets.</p>
+              <h2 class="cms-card-title">Portfolio Projects &amp; Credentials</h2>
+              <p class="cms-card-desc">Manage project documentation, step-by-step milestones, photos, and clickable Google Drive / Sheets links.</p>
             </div>
             <button type="button" id="btn-open-create-item-form" class="btn btn-primary btn-sm">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-              <span>+ Buat Proyek Baru</span>
+              <span>+ Create New Project</span>
             </button>
           </div>
 
@@ -409,11 +482,11 @@
             <table class="admin-items-table">
               <thead>
                 <tr>
-                  <th>Bab</th>
-                  <th>Judul Proyek</th>
-                  <th>Organisasi</th>
-                  <th>Kelengkapan</th>
-                  <th>Aksi</th>
+                  <th>Chapter</th>
+                  <th>Project Title</th>
+                  <th>Organization</th>
+                  <th>Media &amp; Details</th>
+                  <th>Actions</th>
                 </tr>
               </thead>
               <tbody id="cms-items-table-body">
@@ -423,11 +496,11 @@
           </div>
         </div>
 
-        <!-- Form Tambah / Edit Proyek (Modal Inline) -->
+        <!-- Add / Edit Project Form Panel (Inline Modal) -->
         <div id="cms-item-editor-panel" class="cms-panel-card" style="display: none; border-left: 4px solid var(--blue-primary);">
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
-            <h3 id="item-editor-title-heading" style="color: var(--blue-light); font-size: 1.15rem; font-weight: 700;">Edit Proyek Portofolio</h3>
-            <button type="button" id="btn-close-item-editor" class="btn btn-outline btn-sm">Tutup Editor</button>
+            <h3 id="item-editor-title-heading" style="color: var(--blue-light); font-size: 1.15rem; font-weight: 700;">Edit Project Item</h3>
+            <button type="button" id="btn-close-item-editor" class="btn btn-outline btn-sm">Close Editor</button>
           </div>
 
           <form id="cms-item-form">
@@ -435,96 +508,96 @@
 
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
               <div class="form-group">
-                <label class="form-label" for="item-form-chapter">Kategori Bab / Section (Ketik Bebas) *</label>
-                <input type="text" id="item-form-chapter" class="form-control" list="chapter-suggestions-list" placeholder="Ketik nama bab (misal: Work Experience, Project (as Leader), HR Campaign)..." required>
+                <label class="form-label" for="item-form-chapter">Chapter / Section (Type Freely) *</label>
+                <input type="text" id="item-form-chapter" class="form-control" list="chapter-suggestions-list" placeholder="Type chapter (e.g. Work Experience, Project (as Leader), HR Campaign, Certifications)..." required>
                 <datalist id="chapter-suggestions-list">
                   <!-- Populated dynamically with suggestions -->
                 </datalist>
                 <small style="color: var(--text-muted); font-size: 0.75rem; display: block; margin-top: 0.35rem;">
-                  Ketik manual tulisan bab/section yang Anda inginkan (tidak terbatas pilihan dropdown).
+                  Type freely any chapter name you want (not limited to a dropdown).
                 </small>
               </div>
               <div class="form-group">
-                <label class="form-label" for="item-form-title">Judul Proyek / Program *</label>
+                <label class="form-label" for="item-form-title">Project / Program Title *</label>
                 <input type="text" id="item-form-title" class="form-control" required>
               </div>
             </div>
 
             <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem;">
               <div class="form-group">
-                <label class="form-label" for="item-form-org">Organisasi / Lembaga *</label>
+                <label class="form-label" for="item-form-org">Organization / Institution *</label>
                 <input type="text" id="item-form-org" class="form-control" required>
               </div>
               <div class="form-group">
-                <label class="form-label" for="item-form-role">Peran / Jabatan *</label>
+                <label class="form-label" for="item-form-role">Role / Position *</label>
                 <input type="text" id="item-form-role" class="form-control" required>
               </div>
               <div class="form-group">
-                <label class="form-label" for="item-form-period">Periode Waktu *</label>
+                <label class="form-label" for="item-form-period">Time Period *</label>
                 <input type="text" id="item-form-period" class="form-control" required>
               </div>
             </div>
 
-            <!-- Upload Foto Proyek -->
+            <!-- Upload Project Photo -->
             <div class="form-group" style="background-color: var(--bg-elevated); padding: 1.25rem; border-radius: var(--radius-sm); border: 1px solid var(--border-subtle);">
               <label class="form-label" style="display: flex; justify-content: space-between;">
-                <span>Foto &amp; Dokumentasi Visual Portofolio</span>
-                <span style="font-size: 0.75rem; color: var(--blue-light);">Tersimpan permanen ke folder uploads/</span>
+                <span>Project Photo &amp; Visual Documentation</span>
+                <span style="font-size: 0.75rem; color: var(--blue-light);">Permanently stored in uploads/</span>
               </label>
 
               <div class="upload-dropzone" id="item-image-dropzone">
                 <svg class="upload-icon" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
-                <div class="upload-instruction">Tarik &amp; lepas file foto di sini, atau klik untuk memilih</div>
+                <div class="upload-instruction">Drag &amp; drop an image file here, or click to browse</div>
                 <div class="upload-hint">PNG, JPG, WEBP</div>
                 <input type="file" id="item-file-input" accept="image/*" style="display: none;">
               </div>
 
               <div style="margin-top: 0.75rem;">
-                <label class="form-label" style="font-size: 0.75rem; color: var(--text-muted);" for="item-form-image-url">Atau URL Gambar:</label>
+                <label class="form-label" style="font-size: 0.75rem; color: var(--text-muted);" for="item-form-image-url">Or Image URL:</label>
                 <input type="url" id="item-form-image-url" class="form-control" placeholder="https://...">
               </div>
 
               <div class="image-preview-wrapper" id="item-preview-box" style="display: none;">
                 <img id="item-preview-img" class="image-preview-thumb" src="" alt="Item Preview">
                 <div style="font-size: 0.8rem;">
-                  <div id="item-preview-name" style="font-weight: 700;">Foto Terpilih</div>
-                  <div id="item-preview-status" style="color: var(--status-success);">Siap disimpan</div>
+                  <div id="item-preview-name" style="font-weight: 700;">Selected Photo</div>
+                  <div id="item-preview-status" style="color: var(--status-success);">Ready to save</div>
                 </div>
               </div>
             </div>
 
             <div class="form-group">
-              <label class="form-label" for="item-form-desc">Keterangan Detail Portofolio *</label>
+              <label class="form-label" for="item-form-desc">Detailed Project Description *</label>
               <textarea id="item-form-desc" class="form-control" rows="4" required></textarea>
             </div>
 
             <div class="form-group">
-              <label class="form-label" for="item-form-badges">Badge Metrik / Prestasi (Pisahkan dengan koma)</label>
-              <input type="text" id="item-form-badges" class="form-control" placeholder="Contoh: 220+ Pelamar, 9/10 Kepuasan, Best Intern 2026">
+              <label class="form-label" for="item-form-badges">Achievement Badges (Comma-separated)</label>
+              <input type="text" id="item-form-badges" class="form-control" placeholder="e.g. 220+ Applicants, 9/10 Rating, Best Intern 2026">
             </div>
 
-            <!-- Tautan Clickable Links -->
+            <!-- Clickable Links -->
             <div class="form-group" style="background-color: var(--bg-elevated); padding: 1.25rem; border-radius: var(--radius-sm); border: 1px solid var(--border-subtle);">
               <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
                 <div>
-                  <label class="form-label" style="margin-bottom: 0.25rem;">Tautan Dokumentasi yang Bisa di Klik (Clickable Links)</label>
-                  <p style="font-size: 0.75rem; color: var(--text-muted);">Tautan Google Drive, Google Sheets pelamar, PPT Deck, atau link sertifikat asli.</p>
+                  <label class="form-label" style="margin-bottom: 0.25rem;">Clickable Documentation Links</label>
+                  <p style="font-size: 0.75rem; color: var(--text-muted);">Links to Google Drive archives, Google Sheets applicant databases, slide decks, or credentials.</p>
                 </div>
-                <button type="button" id="btn-add-item-link" class="btn btn-outline btn-sm">+ Tambah Tautan</button>
+                <button type="button" id="btn-add-item-link" class="btn btn-outline btn-sm">+ Add Link</button>
               </div>
               <div id="item-links-editor-list" style="display: flex; flex-direction: column; gap: 0.65rem;">
                 <!-- Link rows -->
               </div>
             </div>
 
-            <!-- Stepping Stones / Alur Proses Kerja -->
+            <!-- Stepping Stones / Process Flow -->
             <div class="form-group" style="background-color: var(--bg-elevated); padding: 1.25rem; border-radius: var(--radius-sm); border: 1px solid var(--border-subtle);">
               <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
                 <div>
-                  <label class="form-label" style="margin-bottom: 0.25rem;">Alur Proses Kerja &amp; Stepping Stones</label>
-                  <p style="font-size: 0.75rem; color: var(--text-muted);">Khusus Sertifikasi ("gimana dpt &amp; PROSESnya") dan Proyek bertahap.</p>
+                  <label class="form-label" style="margin-bottom: 0.25rem;">Execution Milestones &amp; Stepping Stones</label>
+                  <p style="font-size: 0.75rem; color: var(--text-muted);">Step-by-step methodology explaining how you achieved results or earned credentials.</p>
                 </div>
-                <button type="button" id="btn-add-item-step" class="btn btn-outline btn-sm">+ Tambah Langkah</button>
+                <button type="button" id="btn-add-item-step" class="btn btn-outline btn-sm">+ Add Step</button>
               </div>
               <div id="item-steps-editor-list" style="display: flex; flex-direction: column; gap: 0.75rem;">
                 <!-- Step rows -->
@@ -532,8 +605,8 @@
             </div>
 
             <div style="display: flex; justify-content: flex-end; gap: 0.75rem; margin-top: 1.5rem;">
-              <button type="button" id="btn-cancel-item-form" class="btn btn-outline">Batal</button>
-              <button type="submit" class="btn btn-primary">Simpan Proyek Ini</button>
+              <button type="button" id="btn-cancel-item-form" class="btn btn-outline">Cancel</button>
+              <button type="submit" class="btn btn-primary">Save This Project</button>
             </div>
           </form>
         </div>
@@ -544,35 +617,35 @@
            ===================================================================== -->
       <section id="view-frontline" class="section-view">
         <div class="cms-panel-card">
-          <h2 class="cms-card-title">Bagian 05: Work Experience</h2>
-          <p class="cms-card-desc">Sesuaikan pilar operasional kerja dan daftar penempatan industri.</p>
+          <h2 class="cms-card-title">Section 05: Work Experience</h2>
+          <p class="cms-card-desc">Customize frontline operational pillars and industry placement records.</p>
 
           <div class="form-group">
-            <label class="form-label" for="front-title">Judul Bagian</label>
+            <label class="form-label" for="front-title">Section Title</label>
             <input type="text" id="front-title" class="form-control">
           </div>
 
           <div class="form-group">
-            <label class="form-label" for="front-sub">Subjudul Penjelasan</label>
+            <label class="form-label" for="front-sub">Section Subtitle</label>
             <input type="text" id="front-sub" class="form-control">
           </div>
 
           <!-- Pillars -->
           <div style="margin-top: 1.5rem;">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
-              <label class="form-label">Pilar-Pilar Operasional</label>
-              <button type="button" id="btn-add-pillar" class="btn btn-outline btn-sm">+ Tambah Pilar</button>
+              <label class="form-label">Operational Core Pillars</label>
+              <button type="button" id="btn-add-pillar" class="btn btn-outline btn-sm">+ Add Pillar</button>
             </div>
             <div id="frontline-pillars-editor" style="display: flex; flex-direction: column; gap: 0.75rem;">
               <!-- Populated dynamically -->
             </div>
           </div>
 
-          <!-- Placemats -->
+          <!-- Placements -->
           <div style="margin-top: 2rem;">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
-              <label class="form-label">Daftar Tempat / Perusahaan (Placemats)</label>
-              <button type="button" id="btn-add-placement" class="btn btn-outline btn-sm">+ Tambah Tempat</button>
+              <label class="form-label">Industry Placement List (Placemats)</label>
+              <button type="button" id="btn-add-placement" class="btn btn-outline btn-sm">+ Add Placement</button>
             </div>
             <div id="frontline-placements-editor" style="display: flex; flex-direction: column; gap: 0.75rem;">
               <!-- Populated dynamically -->
@@ -582,31 +655,31 @@
       </section>
 
       <!-- =====================================================================
-           VIEW 9: Saluran Kontak
+           VIEW 9: Contact Channels
            ===================================================================== -->
       <section id="view-contact" class="section-view">
         <div class="cms-panel-card">
-          <h2 class="cms-card-title">Bagian 06: Saluran Kontak Langsung</h2>
-          <p class="cms-card-desc">Perbarui alamat email resmi, tautan WhatsApp langsung, profil LinkedIn, dan Instagram.</p>
+          <h2 class="cms-card-title">Section 06: Direct Contact Channels</h2>
+          <p class="cms-card-desc">Update official email, WhatsApp link, LinkedIn URL, and Instagram profile.</p>
 
           <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
             <div class="form-group">
-              <label class="form-label" for="cnt-email">Email Resmi</label>
+              <label class="form-label" for="cnt-email">Official Email</label>
               <input type="email" id="cnt-email" class="form-control" required>
             </div>
             <div class="form-group">
-              <label class="form-label" for="cnt-phone">Nomor Telepon / WhatsApp</label>
+              <label class="form-label" for="cnt-phone">Phone / WhatsApp Number</label>
               <input type="text" id="cnt-phone" class="form-control" required>
             </div>
           </div>
 
           <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
             <div class="form-group">
-              <label class="form-label" for="cnt-linkedin">URL Profil LinkedIn</label>
+              <label class="form-label" for="cnt-linkedin">LinkedIn Profile URL</label>
               <input type="url" id="cnt-linkedin" class="form-control">
             </div>
             <div class="form-group">
-              <label class="form-label" for="cnt-instagram">URL / Handle Instagram</label>
+              <label class="form-label" for="cnt-instagram">Instagram Handle / URL</label>
               <input type="text" id="cnt-instagram" class="form-control">
             </div>
           </div>
@@ -614,27 +687,27 @@
       </section>
 
       <!-- =====================================================================
-           VIEW 10: Cadangan & Database
+           VIEW 10: Backup & Database
            ===================================================================== -->
       <section id="view-backup" class="section-view">
         <div class="cms-panel-card">
-          <h2 class="cms-card-title">Pencadangan Data &amp; Sinkronisasi File</h2>
-          <p class="cms-card-desc">Unduh cadangan data portofolio Anda sebagai file JSON atau pulihkan data kapan saja.</p>
+          <h2 class="cms-card-title">Data Backup &amp; Synchronization</h2>
+          <p class="cms-card-desc">Download a complete JSON backup of your portfolio data or restore anytime.</p>
 
           <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
             <button id="cms-btn-export-json" class="btn btn-outline">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-              <span>Ekspor Backup JSON</span>
+              <span>Export JSON Backup</span>
             </button>
 
             <label class="btn btn-secondary" style="cursor: pointer;">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-              <span>Impor Restore JSON</span>
+              <span>Import &amp; Restore JSON</span>
               <input type="file" id="cms-import-file" accept=".json" style="display: none;">
             </label>
 
             <button id="cms-btn-reset-default" class="btn btn-outline" style="color: #F87171; border-color: rgba(239, 68, 68, 0.3);">
-              Reset ke Data Standar
+              Reset to Default Data
             </button>
           </div>
         </div>
@@ -646,7 +719,6 @@
   <div class="toast-container" id="toast-container"></div>
 
   <!-- Admin Controller Script -->
-  <script src="admin.js"></script>
+  <script src="admin.js?v=2.2"></script>
 </body>
 </html>
-

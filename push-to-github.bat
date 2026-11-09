@@ -9,7 +9,16 @@ echo.
 
 cd /d "%~dp0"
 
-:: Cek apakah git terpasang
+:: Cek apakah git terpasang (cek juga default install path)
+where git >nul 2>nul
+if %ERRORLEVEL% neq 0 (
+    if exist "C:\Program Files\Git\cmd\git.exe" (
+        set "PATH=%PATH%;C:\Program Files\Git\cmd"
+    ) else if exist "%LOCALAPPDATA%\Programs\Git\cmd\git.exe" (
+        set "PATH=%PATH%;%LOCALAPPDATA%\Programs\Git\cmd"
+    )
+)
+
 where git >nul 2>nul
 if %ERRORLEVEL% neq 0 (
     echo [ERROR] Git tidak ditemukan di komputer kamu!
@@ -33,8 +42,8 @@ if "%commit_msg%"=="" (
 )
 
 echo.
-echo [2/4] Menambahkan semua perubahan ke staging (git add .)...
-git add .
+echo [2/4] Menambahkan semua perubahan ke staging (git add -A)...
+git add -A
 
 echo.
 echo [3/4] Melakukan commit dengan pesan: "%commit_msg%"...

@@ -722,10 +722,7 @@
   function saveItemFromForm() {
     const itemId = getVal('item-form-id') || (`item-${Date.now()}`);
     const typedChapter = (getVal('item-form-chapter') || '').trim();
-    const matchCh = (data.chapters || []).find(c => 
-      c.title.toLowerCase().trim() === typedChapter.toLowerCase() || 
-      c.id.toLowerCase().trim() === typedChapter.toLowerCase()
-    );
+    const matchCh = findChapterForItem(typedChapter, data.chapters || DEFAULT_CHAPTERS);
     const chapterId = matchCh ? matchCh.id : typedChapter;
     const title = getVal('item-form-title');
     const organization = getVal('item-form-org');
@@ -734,8 +731,8 @@
     const description = getVal('item-form-desc');
     const badges = getVal('item-form-badges').split(',').map(b => b.trim()).filter(Boolean);
 
-    let image = getVal('item-form-image-url');
-    if (pendingItemPhoto) image = pendingItemPhoto;
+    const existingItem = (data.items || []).find(i => i.id === itemId);
+    let image = pendingItemPhoto || getVal('item-form-image-url') || (existingItem ? existingItem.image : '');
 
     // Links
     const links = [];
@@ -814,8 +811,8 @@
         row.style.borderRadius = 'var(--radius-sm)';
 
         row.innerHTML = `
-          <input type="text" class="form-control pl-asp" value="${escapeHtml(p.aspect)}" placeholder="Nama Aspek">
-          <input type="text" class="form-control pl-dsc" value="${escapeHtml(p.description)}" placeholder="Deskripsi">
+          <input type="text" class="form-control pl-asp" value="${escapeHtml(p.aspect)}" placeholder="Aspect / Pillar Title">
+          <input type="text" class="form-control pl-dsc" value="${escapeHtml(p.description)}" placeholder="Description">
           <button type="button" class="btn btn-outline btn-sm" style="color: #EF4444;">✕</button>
         `;
         row.querySelector('button').addEventListener('click', () => {
@@ -830,7 +827,7 @@
     if (addPillarBtn) {
       addPillarBtn.onclick = () => {
         if (!f.pillars) f.pillars = [];
-        f.pillars.push({ aspect: 'Aspek Baru', description: 'Keterangan' });
+        f.pillars.push({ aspect: 'New Pillar', description: 'Description' });
         populateFrontlineView();
       };
     }
@@ -849,9 +846,9 @@
         row.style.borderRadius = 'var(--radius-sm)';
 
         row.innerHTML = `
-          <input type="text" class="form-control pm-n" value="${escapeHtml(pm.name)}" placeholder="Nama Lokasi">
-          <input type="text" class="form-control pm-r" value="${escapeHtml(pm.role)}" placeholder="Peran">
-          <input type="text" class="form-control pm-f" value="${escapeHtml(pm.focus)}" placeholder="Fokus & Tugas">
+          <input type="text" class="form-control pm-n" value="${escapeHtml(pm.name)}" placeholder="Company / Location Name">
+          <input type="text" class="form-control pm-r" value="${escapeHtml(pm.role)}" placeholder="Role / Title">
+          <input type="text" class="form-control pm-f" value="${escapeHtml(pm.focus)}" placeholder="Focus & Key Responsibility">
           <button type="button" class="btn btn-outline btn-sm" style="color: #EF4444;">✕</button>
         `;
         row.querySelector('button').addEventListener('click', () => {
@@ -923,15 +920,20 @@
     if (metricsArr.length > 0) data.metrics = metricsArr;
 
     // Chapters
-    const chaptersArr = [];
-    document.querySelectorAll('#chapters-editor-list > div').forEach((card, idx) => {
-      const n = card.querySelector('.ch-num').value.trim();
-      const t = card.querySelector('.ch-title').value.trim();
-      const d = card.querySelector('.ch-desc').value.trim();
-      const origId = (data.chapters && data.chapters[idx] && data.chapters[idx].id) || `chapter-${idx}`;
-      if (t) chaptersArr.push({ id: origId, number: n, title: t, shortDesc: d });
-    });
-    if (chaptersArr.length > 0) data.chapters = chaptersArr;
+    const chaptersCards = document.querySelectorAll('#chapters-editor-list > div');
+    if (chaptersCards.length > 0) {
+      const chaptersArr = [];
+      chaptersCards.forEach((card, idx) => {
+        const n = card.querySelector('.ch-num') ? card.querySelector('.ch-num').value.trim() : '';
+        const t = card.querySelector('.ch-title') ? card.querySelector('.ch-title').value.trim() : '';
+        const d = card.querySelector('.ch-desc') ? card.querySelector('.ch-desc').value.trim() : '';
+        const origId = (data.chapters && data.chapters[idx] && data.chapters[idx].id) || `chapter-${idx}`;
+        if (t) chaptersArr.push({ id: origId, number: n || String(idx + 1).padStart(2, '0'), title: t, shortDesc: d });
+      });
+      if (chaptersArr.length > 0) data.chapters = chaptersArr;
+    } else if (!data.chapters || data.chapters.length === 0) {
+      data.chapters = JSON.parse(JSON.stringify(DEFAULT_CHAPTERS));
+    }
 
     // Frontline
     if (!data.frontlineExperience) data.frontlineExperience = {};

@@ -14,16 +14,16 @@
 
   // View titles map
   const viewTitles = {
-    'view-layout': 'Tata Letak & Urutan Bagian',
-    'view-cover': 'Cover & Identitas Utama',
-    'view-intro': 'Intro & Sambutan Rekruter',
-    'view-profile': 'Profil Akademik & Kompetensi',
-    'view-metrics': 'Bilah Metrik Dampak',
-    'view-chapters': 'Kelola Bab Pengalaman',
-    'view-items': 'Daftar Portofolio & Proyek',
+    'view-layout': 'Layout & Section Order',
+    'view-cover': 'Cover & Core Identity',
+    'view-intro': 'Intro & Recruiter Welcome Note',
+    'view-profile': 'Academic Profile & Competencies',
+    'view-metrics': 'Impact Metrics Strip',
+    'view-chapters': 'Manage Experience Chapters',
+    'view-items': 'Portfolio Projects & Credentials',
     'view-frontline': 'Work Experience',
-    'view-contact': 'Saluran Kontak Langsung',
-    'view-backup': 'Pencadangan Data & Server'
+    'view-contact': 'Direct Contact Channels',
+    'view-backup': 'Data Backup & Database Sync'
   };
 
   // --------------------------------------------------------------------------
@@ -43,7 +43,7 @@
   async function loadData() {
     // 1. Try server
     try {
-      const resp = await fetch('/api/data', { cache: 'no-store' });
+      const resp = await fetch('/api/data?t=' + Date.now(), { cache: 'no-store' });
       if (resp.ok) {
         data = await resp.json();
         isServerActive = true;
@@ -67,13 +67,13 @@
 
     // 3. Bundled data
     try {
-      const fb = await fetch('data/portfolio.json');
+      const fb = await fetch('data/portfolio.json?t=' + Date.now());
       if (fb.ok) {
         data = await fb.json();
         localStorage.setItem('trista_portfolio_data', JSON.stringify(data));
       }
     } catch (e) {
-      showToast('Gagal memuat data default.', 'error');
+      showToast('Failed to load default data.', 'error');
     }
   }
 
@@ -83,18 +83,20 @@
     // Collect all active form values
     collectFormValues();
 
-    // Save to LocalStorage
+    // Bump and synchronize data version
+    const dataVer = 'v' + Date.now();
+    localStorage.setItem('trista_data_version', dataVer);
     localStorage.setItem('trista_portfolio_data', JSON.stringify(data));
 
-    // Save to Server
+    // Save to Server with timestamp to avoid any proxy caching
     try {
-      const resp = await fetch('/api/data', {
+      const resp = await fetch('/api/data?t=' + Date.now(), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data, null, 2)
       });
       if (resp.ok) {
-        showToast('Seluruh perubahan berhasil disimpan secara permanen ke server.', 'success');
+        showToast('All changes successfully saved to the server.', 'success');
         updateServerBadge(true);
         return;
       }
@@ -102,18 +104,18 @@
       updateServerBadge(false);
     }
 
-    showToast('Perubahan tersimpan di memori browser (LocalStorage).', 'info');
+    showToast('Changes saved locally to browser storage.', 'info');
   }
 
   function updateServerBadge(active) {
     const el = document.getElementById('cms-server-indicator');
     if (!el) return;
-    const currentPort = window.location.port || '3000';
+    const currentPort = window.location.port ? `Port ${window.location.port}` : 'Online';
     if (active) {
-      el.textContent = '● Terhubung ke Server (Port ' + currentPort + ')';
+      el.textContent = `● Server Connected (${currentPort})`;
       el.style.color = 'var(--status-success)';
     } else {
-      el.textContent = '○ Mode Mandiri Browser (LocalStorage)';
+      el.textContent = '○ Standalone Browser Mode (LocalStorage)';
       el.style.color = 'var(--blue-light)';
     }
   }
@@ -170,12 +172,12 @@
       data.layout = {
         sections: [
           { id: 'cover', name: 'Cover & Hero', visible: true, order: 1 },
-          { id: 'metrics', name: 'Bilah Metrik Utama', visible: true, order: 2 },
-          { id: 'intro', name: 'Intro & Sambutan', visible: true, order: 3 },
-          { id: 'profile', name: 'Profil & Akademik', visible: true, order: 4 },
-          { id: 'experience', name: 'Bab Pengalaman (Chapters)', visible: true, order: 5 },
+          { id: 'metrics', name: 'Key Metrics Strip', visible: true, order: 2 },
+          { id: 'intro', name: 'Introduction & Welcome', visible: true, order: 3 },
+          { id: 'profile', name: 'Profile & Academics', visible: true, order: 4 },
+          { id: 'experience', name: 'Experience Chapters', visible: true, order: 5 },
           { id: 'frontline', name: 'Work Experience', visible: true, order: 6 },
-          { id: 'contact', name: 'Saluran Kontak Langsung', visible: true, order: 7 }
+          { id: 'contact', name: 'Direct Contact Channels', visible: true, order: 7 }
         ]
       };
     }
@@ -194,8 +196,8 @@
           </div>
         </div>
         <div style="display: flex; gap: 0.4rem;">
-          <button type="button" class="btn btn-outline btn-sm btn-move-up" data-idx="${idx}" ${idx === 0 ? 'disabled style="opacity: 0.3;"' : ''}>▲ Naik</button>
-          <button type="button" class="btn btn-outline btn-sm btn-move-down" data-idx="${idx}" ${idx === sections.length - 1 ? 'disabled style="opacity: 0.3;"' : ''}>▼ Turun</button>
+          <button type="button" class="btn btn-outline btn-sm btn-move-up" data-idx="${idx}" ${idx === 0 ? 'disabled style="opacity: 0.3;"' : ''}>▲ Up</button>
+          <button type="button" class="btn btn-outline btn-sm btn-move-down" data-idx="${idx}" ${idx === sections.length - 1 ? 'disabled style="opacity: 0.3;"' : ''}>▼ Down</button>
         </div>
       `;
 
@@ -290,9 +292,9 @@
 
       row.innerHTML = `
         <input type="text" class="form-control m-val" value="${escapeHtml(m.value)}" placeholder="220+">
-        <input type="text" class="form-control m-lbl" value="${escapeHtml(m.label)}" placeholder="Label Metrik">
-        <input type="text" class="form-control m-dsc" value="${escapeHtml(m.description)}" placeholder="Keterangan singkat">
-        <button type="button" class="btn btn-outline btn-sm" style="color: #EF4444;" title="Hapus Metrik">✕</button>
+        <input type="text" class="form-control m-lbl" value="${escapeHtml(m.label)}" placeholder="Metric Label">
+        <input type="text" class="form-control m-dsc" value="${escapeHtml(m.description)}" placeholder="Short description">
+        <button type="button" class="btn btn-outline btn-sm" style="color: #EF4444;" title="Delete Metric">✕</button>
       `;
 
       row.querySelector('button').addEventListener('click', () => {
@@ -313,13 +315,111 @@
     }
   }
 
+  // --------------------------------------------------------------------------
+  // Default Chapters Definition and Chapter Finder Helper
+  // --------------------------------------------------------------------------
+  const DEFAULT_CHAPTERS = [
+    {
+      id: 'hr-campaign',
+      number: '01',
+      title: 'HR Campaign',
+      shortDesc: 'Case Competitions, Social Innovation & Youth Career Initiatives.'
+    },
+    {
+      id: 'work-experience',
+      number: '02',
+      title: 'Work Experience',
+      shortDesc: 'Strategic HR Management, Internship Program Development & Process Automation.'
+    },
+    {
+      id: 'sertifikasi',
+      number: '03',
+      title: 'Certifications',
+      shortDesc: 'National Professional Certifications & Strategic Business Foundations.'
+    },
+    {
+      id: 'project-leader',
+      number: '04',
+      title: 'Project (as Leader)',
+      shortDesc: 'Strategic HR, Operational Frameworks & People Management Initiatives.'
+    },
+    {
+      id: 'organizational',
+      number: '05',
+      title: 'Organizational Experience',
+      shortDesc: 'Student Leadership, Cross-Functional Coordination & HR Event Operations.'
+    },
+    {
+      id: 'others',
+      number: '06',
+      title: 'Others',
+      shortDesc: 'Global Summits, Liaison Logistics & Campus Event Secretariat.'
+    }
+  ];
+
+  function findChapterForItem(chapterId, chaptersList) {
+    if (!chapterId) return null;
+    const list = (chaptersList && chaptersList.length > 0) ? chaptersList : DEFAULT_CHAPTERS;
+    const raw = chapterId.toString().trim().toLowerCase();
+    const clean = raw.replace(/^\d{1,2}\.?\s*/, '').replace(/[^a-z0-9]/g, '');
+
+    // 1. Exact ID, Title, or Numbered Title match
+    const exact = list.find(c => {
+      const cId = (c.id || '').toLowerCase().trim();
+      const cTitle = (c.title || '').toLowerCase().trim();
+      const cNumbered = `${c.number}. ${c.title}`.toLowerCase().trim();
+      return cId === raw || cTitle === raw || cNumbered === raw;
+    });
+    if (exact) return exact;
+
+    // 2. Normalized match (without numbers or special characters)
+    const normalized = list.find(c => {
+      const cIdClean = (c.id || '').toLowerCase().replace(/[^a-z0-9]/g, '');
+      const cTitleClean = (c.title || '').toLowerCase().replace(/^\d{1,2}\.?\s*/, '').replace(/[^a-z0-9]/g, '');
+      return cIdClean === clean || cTitleClean === clean;
+    });
+    if (normalized) return normalized;
+
+    // 3. Synonym matching
+    if (clean.includes('certif') || clean.includes('sertif')) {
+      const hit = list.find(c => c.id === 'sertifikasi' || (c.title || '').toLowerCase().includes('certif'));
+      if (hit) return hit;
+    }
+    if (clean.includes('campaign') || clean.includes('hrcampaign')) {
+      const hit = list.find(c => c.id === 'hr-campaign' || (c.title || '').toLowerCase().includes('campaign'));
+      if (hit) return hit;
+    }
+    if (clean.includes('project') || clean.includes('leader')) {
+      const hit = list.find(c => c.id === 'project-leader' || (c.title || '').toLowerCase().includes('project'));
+      if (hit) return hit;
+    }
+    if (clean.includes('work') || clean.includes('intern') || clean.includes('job')) {
+      const hit = list.find(c => c.id === 'work-experience' || (c.title || '').toLowerCase().includes('work'));
+      if (hit) return hit;
+    }
+    if (clean.includes('organ') || clean.includes('org')) {
+      const hit = list.find(c => c.id === 'organizational' || (c.title || '').toLowerCase().includes('organ'));
+      if (hit) return hit;
+    }
+    if (clean.includes('other')) {
+      const hit = list.find(c => c.id === 'others' || (c.title || '').toLowerCase().includes('other'));
+      if (hit) return hit;
+    }
+
+    return null;
+  }
+
   // 6. Chapters View
   function populateChaptersView() {
     const container = document.getElementById('chapters-editor-list');
     if (!container) return;
     container.innerHTML = '';
 
-    const chapters = data.chapters || [];
+    if (!data.chapters || !Array.isArray(data.chapters) || data.chapters.length === 0) {
+      data.chapters = JSON.parse(JSON.stringify(DEFAULT_CHAPTERS));
+    }
+
+    const chapters = data.chapters;
     chapters.forEach((ch, idx) => {
       const card = document.createElement('div');
       card.style.backgroundColor = 'var(--bg-elevated)';
@@ -329,15 +429,15 @@
 
       card.innerHTML = `
         <div style="display: grid; grid-template-columns: 80px 1.5fr auto; gap: 0.75rem; align-items: center; margin-bottom: 0.5rem;">
-          <input type="text" class="form-control ch-num" value="${escapeHtml(ch.number)}" placeholder="01">
-          <input type="text" class="form-control ch-title" value="${escapeHtml(ch.title)}" placeholder="Judul Bab">
-          <button type="button" class="btn btn-outline btn-sm btn-del-ch" style="color: #EF4444;">✕ Hapus</button>
+          <input type="text" class="form-control ch-num" value="${escapeHtml(ch.number || String(idx + 1).padStart(2, '0'))}" placeholder="01">
+          <input type="text" class="form-control ch-title" value="${escapeHtml(ch.title || '')}" placeholder="Chapter Title">
+          <button type="button" class="btn btn-outline btn-sm btn-del-ch" style="color: #EF4444;">✕ Delete</button>
         </div>
-        <input type="text" class="form-control ch-desc" value="${escapeHtml(ch.shortDesc || '')}" placeholder="Deskripsi ringkas bab ini">
+        <input type="text" class="form-control ch-desc" value="${escapeHtml(ch.shortDesc || '')}" placeholder="Short description for this chapter">
       `;
 
       card.querySelector('.btn-del-ch').addEventListener('click', () => {
-        if (confirm(`Hapus bab "${ch.title}"?`)) {
+        if (confirm(`Delete chapter "${ch.title}"?`)) {
           chapters.splice(idx, 1);
           populateChaptersView();
           populateItemChapterDropdown();
@@ -354,11 +454,23 @@
         chapters.push({
           id: `chapter-${Date.now()}`,
           number: nextNum,
-          title: `Bab Baru ${nextNum}`,
-          shortDesc: 'Deskripsi bab'
+          title: `New Chapter ${nextNum}`,
+          shortDesc: 'Chapter description'
         });
         populateChaptersView();
         populateItemChapterDropdown();
+      };
+    }
+
+    const resetBtn = document.getElementById('btn-reset-default-chapters');
+    if (resetBtn) {
+      resetBtn.onclick = () => {
+        if (confirm('Restore the standard 6 experience chapters?')) {
+          data.chapters = JSON.parse(JSON.stringify(DEFAULT_CHAPTERS));
+          populateChaptersView();
+          populateItemChapterDropdown();
+          showToast('Restored standard 6 chapters.', 'success');
+        }
       };
     }
   }
@@ -372,8 +484,8 @@
     const items = data.items || [];
     items.forEach(item => {
       const row = document.createElement('tr');
-      const ch = (data.chapters || []).find(c => c.id === item.chapterId);
-      const chLabel = ch ? `${ch.number}. ${ch.title}` : item.chapterId;
+      const ch = findChapterForItem(item.chapterId, data.chapters || DEFAULT_CHAPTERS);
+      const chLabel = ch ? `${ch.number}. ${ch.title}` : (item.chapterId || 'Uncategorized');
       const linksCount = (item.links || []).length;
       const stepsCount = (item.steppingStones || []).length;
 
@@ -386,15 +498,15 @@
         <td>${escapeHtml(item.organization || '-')}</td>
         <td>
           <div style="font-size: 0.75rem;">
-            <span>${item.image ? '✓ Ada Foto' : '○ Belum ada'}</span> • 
-            <span>${linksCount} Link</span> • 
-            <span>${stepsCount} Langkah</span>
+            <span>${item.image ? '✓ Photo' : '○ No photo'}</span> • 
+            <span>${linksCount} Link${linksCount !== 1 ? 's' : ''}</span> • 
+            <span>${stepsCount} Step${stepsCount !== 1 ? 's' : ''}</span>
           </div>
         </td>
         <td>
           <div class="admin-action-btn-group">
             <button class="btn btn-secondary btn-sm btn-edit-p" data-id="${item.id}">Edit</button>
-            <button class="btn btn-outline btn-sm btn-del-p" data-id="${item.id}" style="color: #EF4444;">Hapus</button>
+            <button class="btn btn-outline btn-sm btn-del-p" data-id="${item.id}" style="color: #EF4444;">Delete</button>
           </div>
         </td>
       `;
@@ -415,13 +527,25 @@
     datalist.innerHTML = '';
 
     const added = new Set();
-    (data.chapters || []).forEach(ch => {
+    const sourceChapters = (data.chapters && data.chapters.length > 0) ? data.chapters : DEFAULT_CHAPTERS;
+
+    sourceChapters.forEach(ch => {
+      // 1. Title (e.g. Work Experience)
       if (ch.title && !added.has(ch.title.toLowerCase())) {
         const opt = document.createElement('option');
         opt.value = ch.title;
         datalist.appendChild(opt);
         added.add(ch.title.toLowerCase());
       }
+      // 2. Numbered Title (e.g. 02. Work Experience)
+      const numberedTitle = `${ch.number}. ${ch.title}`;
+      if (!added.has(numberedTitle.toLowerCase())) {
+        const opt = document.createElement('option');
+        opt.value = numberedTitle;
+        datalist.appendChild(opt);
+        added.add(numberedTitle.toLowerCase());
+      }
+      // 3. ID (e.g. work-experience)
       if (ch.id && !added.has(ch.id.toLowerCase())) {
         const opt = document.createElement('option');
         opt.value = ch.id;
@@ -452,10 +576,10 @@
       const it = (data.items || []).find(i => i.id === itemId);
       if (!it) return;
 
-      heading.textContent = `Edit Proyek: ${it.title}`;
+      heading.textContent = `Edit Project: ${it.title}`;
       setVal('item-form-id', it.id);
       
-      const chObj = (data.chapters || []).find(c => c.id === it.chapterId || c.title.toLowerCase() === (it.chapterId || '').toLowerCase());
+      const chObj = findChapterForItem(it.chapterId, data.chapters || DEFAULT_CHAPTERS);
       setVal('item-form-chapter', chObj ? chObj.title : (it.chapterId || ''));
       setVal('item-form-title', it.title);
       setVal('item-form-org', it.organization);
@@ -481,7 +605,7 @@
       // Populate Steps
       renderItemStepsEditor(it.steppingStones || []);
     } else {
-      heading.textContent = 'Buat Proyek Portofolio Baru';
+      heading.textContent = 'Create New Project Item';
       setVal('item-form-id', '');
       document.getElementById('cms-item-form').reset();
       const previewBox = document.getElementById('item-preview-box');
@@ -515,17 +639,17 @@
     row.style.alignItems = 'center';
 
     row.innerHTML = `
-      <input type="text" class="form-control lk-t" placeholder="Judul (misal: Google Drive)" value="${escapeHtml(title)}">
+      <input type="text" class="form-control lk-t" placeholder="Title (e.g. Google Drive)" value="${escapeHtml(title)}">
       <input type="url" class="form-control lk-u" placeholder="https://drive.google.com/..." value="${escapeHtml(url)}">
       <select class="form-control lk-c">
         <option value="drive" ${cat === 'drive' ? 'selected' : ''}>Drive</option>
         <option value="sheet" ${cat === 'sheet' ? 'selected' : ''}>Sheets</option>
         <option value="doc" ${cat === 'doc' ? 'selected' : ''}>Docs</option>
         <option value="presentation" ${cat === 'presentation' ? 'selected' : ''}>PPT</option>
-        <option value="certificate" ${cat === 'certificate' ? 'selected' : ''}>Sertifikat</option>
-        <option value="other" ${cat === 'other' ? 'selected' : ''}>Lainnya</option>
+        <option value="certificate" ${cat === 'certificate' ? 'selected' : ''}>Certificate</option>
+        <option value="other" ${cat === 'other' ? 'selected' : ''}>Other</option>
       </select>
-      <button type="button" class="btn btn-outline btn-sm" style="color: #EF4444;" title="Hapus">✕</button>
+      <button type="button" class="btn btn-outline btn-sm" style="color: #EF4444;" title="Delete Link">✕</button>
     `;
 
     row.querySelector('button').addEventListener('click', () => row.remove());
@@ -558,11 +682,11 @@
     row.innerHTML = `
       <input type="number" class="form-control st-num" value="${stepNum}" placeholder="No">
       <div style="display: flex; flex-direction: column; gap: 0.35rem;">
-        <input type="text" class="form-control st-t" placeholder="Nama Langkah (misal: Uji Portofolio)" value="${escapeHtml(title)}">
-        <textarea class="form-control st-d" placeholder="Keterangan langkah..." rows="2">${escapeHtml(detail)}</textarea>
+        <input type="text" class="form-control st-t" placeholder="Step Title (e.g. Needs Assessment)" value="${escapeHtml(title)}">
+        <textarea class="form-control st-d" placeholder="Step description..." rows="2">${escapeHtml(detail)}</textarea>
       </div>
-      <input type="text" class="form-control st-m" placeholder="Metrik Capaian" value="${escapeHtml(metric)}">
-      <button type="button" class="btn btn-outline btn-sm" style="color: #EF4444; margin-top: 0.25rem;" title="Hapus">✕</button>
+      <input type="text" class="form-control st-m" placeholder="Achieved Metric" value="${escapeHtml(metric)}">
+      <button type="button" class="btn btn-outline btn-sm" style="color: #EF4444; margin-top: 0.25rem;" title="Delete">✕</button>
     `;
 
     row.querySelector('button').addEventListener('click', () => row.remove());
@@ -651,10 +775,10 @@
     const idx = data.items.findIndex(i => i.id === itemId);
     if (idx >= 0) {
       data.items[idx] = itemObj;
-      showToast(`Proyek "${title}" berhasil diperbarui.`, 'success');
+      showToast(`Project "${title}" updated successfully.`, 'success');
     } else {
       data.items.unshift(itemObj);
-      showToast(`Proyek baru "${title}" berhasil ditambahkan.`, 'success');
+      showToast(`New project "${title}" added successfully.`, 'success');
     }
 
     document.getElementById('cms-item-editor-panel').style.display = 'none';
@@ -663,11 +787,11 @@
   }
 
   function deleteItem(itemId) {
-    if (!confirm('Hapus proyek ini dari portofolio?')) return;
+    if (!confirm('Are you sure you want to delete this project?')) return;
     data.items = (data.items || []).filter(i => i.id !== itemId);
     populateItemsView();
     persistData();
-    showToast('Proyek berhasil dihapus.', 'info');
+    showToast('Project deleted successfully.', 'info');
   }
 
   // 8. Frontline View
@@ -903,18 +1027,18 @@
         if (previewBox) previewBox.style.display = 'flex';
 
         if (isServerActive) {
-          if (statusSpan) statusSpan.textContent = 'Mengunggah ke server...';
+          if (statusSpan) statusSpan.textContent = 'Uploading to server...';
           const srvUrl = await uploadToServer(file.name, b64);
           if (srvUrl) {
             pendingAvatarPhoto = srvUrl;
             setVal('cov-avatar-url', srvUrl);
-            if (statusSpan) statusSpan.textContent = '✓ Tersimpan di folder uploads/';
-            showToast('Foto profil tersimpan ke server.', 'success');
+            if (statusSpan) statusSpan.textContent = '✓ Saved in uploads/ folder';
+            showToast('Profile photo saved to server.', 'success');
             return;
           }
         }
         pendingAvatarPhoto = b64;
-        showToast('Foto profil siap disimpan.', 'success');
+        showToast('Profile photo ready to save.', 'success');
       } else {
         const previewBox = document.getElementById('item-preview-box');
         const previewImg = document.getElementById('item-preview-img');
@@ -923,18 +1047,18 @@
         if (previewBox) previewBox.style.display = 'flex';
 
         if (isServerActive) {
-          if (statusSpan) statusSpan.textContent = 'Mengunggah ke server...';
+          if (statusSpan) statusSpan.textContent = 'Uploading to server...';
           const srvUrl = await uploadToServer(file.name, b64);
           if (srvUrl) {
             pendingItemPhoto = srvUrl;
             setVal('item-form-image-url', srvUrl);
-            if (statusSpan) statusSpan.textContent = '✓ Tersimpan di folder uploads/';
-            showToast('Foto proyek tersimpan ke server.', 'success');
+            if (statusSpan) statusSpan.textContent = '✓ Saved in uploads/ folder';
+            showToast('Project photo saved to server.', 'success');
             return;
           }
         }
         pendingItemPhoto = b64;
-        showToast('Foto proyek siap disimpan.', 'success');
+        showToast('Project photo ready to save.', 'success');
       }
     };
     reader.readAsDataURL(file);
@@ -945,10 +1069,10 @@
       const res = await fetch('/api/upload', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ filename: filename, data: dataUri })
+        body: JSON.stringify({ filename: filename, image: dataUri, data: dataUri })
       });
       const json = await res.json();
-      if (res.ok && json.success) return json.url;
+      if (res.ok && (json.success || json.status === 'ok')) return json.url;
     } catch (e) {
       console.warn('Upload API call failed', e);
     }
@@ -979,7 +1103,7 @@
         a.click();
         document.body.removeChild(a);
         URL.revokeObjectURL(url);
-        showToast('File cadangan JSON berhasil diunduh.', 'success');
+        showToast('JSON backup file downloaded successfully.', 'success');
       };
     }
 
@@ -994,14 +1118,14 @@
           try {
             const parsed = JSON.parse(evt.target.result);
             if (!parsed.profile || !parsed.items) {
-              throw new Error('Format file JSON tidak sesuai.');
+              throw new Error('Invalid portfolio JSON format.');
             }
             data = parsed;
             populateAllViews();
             await persistData();
-            showToast('Data portofolio berhasil dipulihkan dari cadangan.', 'success');
+            showToast('Portfolio data restored successfully from backup.', 'success');
           } catch (err) {
-            showToast('Gagal memulihkan: ' + err.message, 'error');
+            showToast('Failed to restore: ' + err.message, 'error');
           }
         };
         reader.readAsText(file);
@@ -1012,17 +1136,17 @@
     const resetBtn = document.getElementById('cms-btn-reset-default');
     if (resetBtn) {
       resetBtn.onclick = async () => {
-        if (!confirm('Apakah Anda yakin ingin mengatur ulang data ke format awal?')) return;
+        if (!confirm('Are you sure you want to reset data to default configuration?')) return;
         try {
-          const resp = await fetch('data/portfolio.json');
+          const resp = await fetch('data/portfolio.json?t=' + Date.now());
           if (resp.ok) {
             data = await resp.json();
             populateAllViews();
             await persistData();
-            showToast('Data telah diatur ulang ke format awal.', 'info');
+            showToast('Data reset to default configuration.', 'info');
           }
         } catch (e) {
-          showToast('Gagal memuat format awal.', 'error');
+          showToast('Failed to load default configuration.', 'error');
         }
       };
     }

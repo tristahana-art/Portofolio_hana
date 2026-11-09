@@ -278,22 +278,118 @@
     });
   }
 
+  // --------------------------------------------------------------------------
+  // Default Chapters & Intelligent Chapter Matching Helper
+  // --------------------------------------------------------------------------
+  const DEFAULT_CHAPTERS = [
+    {
+      id: 'hr-campaign',
+      number: '01',
+      title: 'HR Campaign',
+      shortDesc: 'Case Competitions, Social Innovation & Youth Career Initiatives.'
+    },
+    {
+      id: 'work-experience',
+      number: '02',
+      title: 'Work Experience',
+      shortDesc: 'Strategic HR Management, Internship Program Development & Process Automation.'
+    },
+    {
+      id: 'sertifikasi',
+      number: '03',
+      title: 'Certifications',
+      shortDesc: 'National Professional Certifications & Strategic Business Foundations.'
+    },
+    {
+      id: 'project-leader',
+      number: '04',
+      title: 'Project (as Leader)',
+      shortDesc: 'Strategic HR, Operational Frameworks & People Management Initiatives.'
+    },
+    {
+      id: 'organizational',
+      number: '05',
+      title: 'Organizational Experience',
+      shortDesc: 'Student Leadership, Cross-Functional Coordination & HR Event Operations.'
+    },
+    {
+      id: 'others',
+      number: '06',
+      title: 'Others',
+      shortDesc: 'Global Summits, Liaison Logistics & Campus Event Secretariat.'
+    }
+  ];
+
+  function findChapterForItem(chapterId, chaptersList) {
+    if (!chapterId) return null;
+    const list = (chaptersList && chaptersList.length > 0) ? chaptersList : DEFAULT_CHAPTERS;
+    const raw = chapterId.toString().trim().toLowerCase();
+    const clean = raw.replace(/^\d{1,2}\.?\s*/, '').replace(/[^a-z0-9]/g, '');
+
+    // 1. Exact ID, Title, or Numbered Title match
+    const exact = list.find(c => {
+      const cId = (c.id || '').toLowerCase().trim();
+      const cTitle = (c.title || '').toLowerCase().trim();
+      const cNumbered = `${c.number}. ${c.title}`.toLowerCase().trim();
+      return cId === raw || cTitle === raw || cNumbered === raw;
+    });
+    if (exact) return exact;
+
+    // 2. Normalized match (without numbers or special characters)
+    const normalized = list.find(c => {
+      const cIdClean = (c.id || '').toLowerCase().replace(/[^a-z0-9]/g, '');
+      const cTitleClean = (c.title || '').toLowerCase().replace(/^\d{1,2}\.?\s*/, '').replace(/[^a-z0-9]/g, '');
+      return cIdClean === clean || cTitleClean === clean;
+    });
+    if (normalized) return normalized;
+
+    // 3. Synonym matching
+    if (clean.includes('certif') || clean.includes('sertif')) {
+      const hit = list.find(c => c.id === 'sertifikasi' || (c.title || '').toLowerCase().includes('certif'));
+      if (hit) return hit;
+    }
+    if (clean.includes('campaign') || clean.includes('hrcampaign')) {
+      const hit = list.find(c => c.id === 'hr-campaign' || (c.title || '').toLowerCase().includes('campaign'));
+      if (hit) return hit;
+    }
+    if (clean.includes('project') || clean.includes('leader')) {
+      const hit = list.find(c => c.id === 'project-leader' || (c.title || '').toLowerCase().includes('project'));
+      if (hit) return hit;
+    }
+    if (clean.includes('work') || clean.includes('intern') || clean.includes('job')) {
+      const hit = list.find(c => c.id === 'work-experience' || (c.title || '').toLowerCase().includes('work'));
+      if (hit) return hit;
+    }
+    if (clean.includes('organ') || clean.includes('org')) {
+      const hit = list.find(c => c.id === 'organizational' || (c.title || '').toLowerCase().includes('organ'));
+      if (hit) return hit;
+    }
+    if (clean.includes('other')) {
+      const hit = list.find(c => c.id === 'others' || (c.title || '').toLowerCase().includes('other'));
+      if (hit) return hit;
+    }
+
+    return null;
+  }
+
   function renderChapters() {
     if (!elements.chapterTabsBar) return;
     elements.chapterTabsBar.innerHTML = '';
     
+    // Ensure chapters list exists
+    if (!portfolioData.chapters || !Array.isArray(portfolioData.chapters) || portfolioData.chapters.length === 0) {
+      portfolioData.chapters = JSON.parse(JSON.stringify(DEFAULT_CHAPTERS));
+    }
+
     // Gather defined chapters
-    const chapters = [...(portfolioData.chapters || [])];
+    const chapters = [...portfolioData.chapters];
     const items = portfolioData.items || [];
     
     // Auto-discover any custom-typed chapters from items that are not in the chapters list
     items.forEach(it => {
       if (!it.chapterId) return;
-      const exists = chapters.some(ch => 
-        ch.id === it.chapterId || 
-        ch.title.toLowerCase().trim() === it.chapterId.toLowerCase().trim()
-      );
-      if (!exists) {
+      const matched = findChapterForItem(it.chapterId, chapters);
+      if (!matched) {
         chapters.push({
           id: it.chapterId,
           number: String(chapters.length + 1).padStart(2, '0'),
@@ -308,9 +404,8 @@
       return items.filter(it => {
         if (!it.chapterId) return false;
         if (it.chapterId === ch.id) return true;
-        if (it.chapterId.toLowerCase().trim() === ch.title.toLowerCase().trim()) return true;
-        if (it.chapterId.toLowerCase().trim() === ch.id.toLowerCase().trim()) return true;
-        return false;
+        const matched = findChapterForItem(it.chapterId, chapters);
+        return matched && matched.id === ch.id;
       }).length;
     }
 
@@ -362,13 +457,11 @@
         return text.includes(query);
       });
     } else if (activeChapterId !== 'all') {
-      const activeObj = (portfolioData.chapters || []).find(c => c.id === activeChapterId);
       items = items.filter(it => {
         if (!it.chapterId) return false;
         if (it.chapterId === activeChapterId) return true;
-        if (activeObj && it.chapterId.toLowerCase().trim() === activeObj.title.toLowerCase().trim()) return true;
-        if (activeObj && it.chapterId.toLowerCase().trim() === activeObj.id.toLowerCase().trim()) return true;
-        return false;
+        const matched = findChapterForItem(it.chapterId, portfolioData.chapters || DEFAULT_CHAPTERS);
+        return matched && matched.id === activeChapterId;
       });
     }
 
@@ -396,10 +489,7 @@
       const card = document.createElement('div');
       card.className = `item-card reveal-on-scroll reveal-stagger-${(idx % 4) + 1}`;
 
-      const chapterObj = (portfolioData.chapters || []).find(c => 
-        c.id === item.chapterId || 
-        c.title.toLowerCase().trim() === (item.chapterId || '').toLowerCase().trim()
-      );
+      const chapterObj = findChapterForItem(item.chapterId, portfolioData.chapters || DEFAULT_CHAPTERS);
       const chapterLabel = chapterObj ? `${chapterObj.number}. ${chapterObj.title}` : item.chapterId;
       const mediaImg = item.image || 'https://images.unsplash.com/photo-1542744173-8e7e53415bb0?auto=format&fit=crop&w=800&q=80';
 
@@ -501,7 +591,7 @@
   function openDetailModal(item) {
     if (!elements.itemDetailModal) return;
 
-    const chObj = (portfolioData.chapters || []).find(c => c.id === item.chapterId);
+    const chObj = findChapterForItem(item.chapterId, portfolioData.chapters || DEFAULT_CHAPTERS);
     elements.modalItemChapter.textContent = chObj ? `${chObj.number}. ${chObj.title}` : item.chapterId;
     elements.modalItemTitle.textContent = item.title;
     elements.modalItemOrgPeriod.textContent = `${item.organization || ''} | ${item.role || ''} | ${item.period || ''}`;

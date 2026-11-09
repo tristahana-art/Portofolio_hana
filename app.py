@@ -25,6 +25,16 @@ os.makedirs(UPLOAD_DIR, exist_ok=True)
 os.makedirs(os.path.join(BASE_DIR, 'data'), exist_ok=True)
 
 # ---------------------------------------------------------------------------
+# Cache-Control: Never cache dynamic API or updated assets
+# ---------------------------------------------------------------------------
+@app.after_request
+def add_cache_headers(response):
+    response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate, max-age=0'
+    response.headers['Pragma'] = 'no-cache'
+    response.headers['Expires'] = '0'
+    return response
+
+# ---------------------------------------------------------------------------
 # Helper
 # ---------------------------------------------------------------------------
 def load_portfolio():
@@ -96,7 +106,7 @@ def api_save_data():
         if not payload:
             return jsonify({'error': 'No JSON payload'}), 400
         save_portfolio(payload)
-        return jsonify({'status': 'ok', 'message': 'Data saved successfully'})
+        return jsonify({'status': 'ok', 'success': True, 'message': 'Data saved successfully'})
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
@@ -116,16 +126,15 @@ def api_upload():
             ext      = os.path.splitext(file.filename)[1].lower()
             filename = f"{uuid.uuid4().hex}{ext}"
             file.save(os.path.join(UPLOAD_DIR, filename))
-            return jsonify({'status': 'ok', 'url': f'/uploads/{filename}'})
+            return jsonify({'status': 'ok', 'success': True, 'url': f'/uploads/{filename}'})
 
         # Base64 JSON upload (from admin.js)
-        body = request.get_json(force=True)
-        if body and 'image' in body:
-            img_data = body['image']
+        body = request.get_json(force=True) or {}
+        img_data = body.get('image') or body.get('data')
+        if img_data:
             # Strip data URI header if present
             if ',' in img_data:
                 header, img_data = img_data.split(',', 1)
-                # Detect extension from header
                 if 'png' in header:
                     ext = '.png'
                 elif 'gif' in header:
@@ -141,7 +150,7 @@ def api_upload():
             filepath = os.path.join(UPLOAD_DIR, filename)
             with open(filepath, 'wb') as f:
                 f.write(base64.b64decode(img_data))
-            return jsonify({'status': 'ok', 'url': f'/uploads/{filename}'})
+            return jsonify({'status': 'ok', 'success': True, 'url': f'/uploads/{filename}'})
 
         return jsonify({'error': 'No image data provided'}), 400
 
@@ -162,8 +171,7 @@ if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))
     print(f"\n{'='*58}")
     print(f"  Portofolio Trista Hana - Flask Dev Server")
-    print(f"  Alamat: http://localhost:{port}")
-    print(f"  Admin:  http://localhost:{port}/admin")
+    print(f"  Address: http://localhost:{port}")
+    print(f"  Admin:   http://localhost:{port}/admin")
     print(f"{'='*58}\n")
     app.run(host='0.0.0.0', port=port, debug=False)
-

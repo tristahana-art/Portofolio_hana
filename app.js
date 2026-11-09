@@ -1,845 +1,178 @@
-// ==============================================================================
-// PORTOFOLIO PROFESIONAL - TRISTA HANA QONITA RAHMAWATI
-// Frontend Engine & Lovable-Style Scroll Experience
-// Anti-Slop Compliant (R-02: Zero em dash, clean geometry, authentic tone)
-// ==============================================================================
-
-(function () {
-  'use strict';
-
-  // Global State
-  let portfolioData = null;
-  let activeChapterId = 'hr-campaign';
-
-  // Clear stale localStorage (bumped when data updated to English)
-  const DATA_VERSION = 'v3';
-  if (localStorage.getItem('trista_data_version') !== DATA_VERSION) {
-    localStorage.removeItem('trista_portfolio_data');
-    localStorage.setItem('trista_data_version', DATA_VERSION);
-  }
-
-  // DOM Elements Cache
-  const elements = {
-    // Flow & Scroll elements
-    mainFlow: document.getElementById('main-content-flow'),
-    scrollProgressBar: document.getElementById('scroll-progress-bar'),
-    brandLogoTrigger: document.getElementById('brand-logo-trigger'),
-    navLinks: document.querySelectorAll('#main-nav-links .nav-item'),
-    
-    // Display Containers
-    metricsContainer: document.getElementById('metrics-container'),
-    heroKeywordsContainer: document.getElementById('hero-keywords-container'),
-    skillsListContainer: document.getElementById('skills-list-container'),
-    coursesListContainer: document.getElementById('courses-list-container'),
-    toolsListContainer: document.getElementById('tools-list-container'),
-    chapterTabsBar: document.getElementById('chapter-tabs-bar'),
-    portfolioItemsContainer: document.getElementById('portfolio-items-container'),
-    portfolioSearchInput: document.getElementById('portfolio-search-input'),
-    btnShowAllItems: document.getElementById('btn-show-all-items'),
-    frontlinePillarsContainer: document.getElementById('frontline-pillars-container'),
-    industryPlacematsContainer: document.getElementById('industry-placemats-container'),
-    
-    // Hero & Profile Displays
-    heroNameDisplay: document.getElementById('hero-name-display'),
-    heroStatusText: document.getElementById('hero-status-text'),
-    profileTitleDisplay: document.getElementById('profile-title-display'),
-    profileSummaryDisplay: document.getElementById('profile-summary-display'),
-    profileAvatarDisplay: document.getElementById('profile-avatar-display'),
-    profileGpaStat: document.getElementById('profile-gpa-stat'),
-    profileCreditsStat: document.getElementById('profile-credits-stat'),
-    introHeadingDisplay: document.getElementById('intro-heading-display'),
-    profileIntroDisplay: document.getElementById('profile-intro-display'),
-    profileWorkloadDisplay: document.getElementById('profile-workload-display'),
-    profileSectionTitle: document.getElementById('profile-section-title'),
-    profileSectionSubtitle: document.getElementById('profile-section-subtitle'),
-    profilePhotoSecondary: document.getElementById('profile-photo-secondary'),
-    profileShortName: document.getElementById('profile-short-name'),
-    profileMajorDisplay: document.getElementById('profile-major-display'),
-    profileUnivDisplay: document.getElementById('profile-univ-display'),
-    profileGpaVal: document.getElementById('profile-gpa-val'),
-    profileSksVal: document.getElementById('profile-sks-val'),
-    profileCohortVal: document.getElementById('profile-cohort-val'),
-    profileHighschoolVal: document.getElementById('profile-highschool-val'),
-    profileLocationVal: document.getElementById('profile-location-val'),
-    contactEmailVal: document.getElementById('contact-email-val'),
-    contactPhoneVal: document.getElementById('contact-phone-val'),
-
-    // Item Detail Modal
-    itemDetailModal: document.getElementById('item-detail-modal'),
-    btnCloseDetailModal: document.getElementById('btn-close-detail-modal'),
-    modalItemChapter: document.getElementById('modal-item-chapter'),
-    modalItemTitle: document.getElementById('modal-item-title'),
-    modalItemOrgPeriod: document.getElementById('modal-item-org-period'),
-    modalItemImage: document.getElementById('modal-item-image'),
-    modalItemDescription: document.getElementById('modal-item-description'),
-    modalItemBadges: document.getElementById('modal-item-badges'),
-    modalSteppingTitleText: document.getElementById('modal-stepping-title-text'),
-    modalSteppingStonesList: document.getElementById('modal-stepping-stones-list'),
-    modalItemLinks: document.getElementById('modal-item-links'),
-    toastContainer: document.getElementById('toast-container')
-  };
-
-  // --------------------------------------------------------------------------
-  // Initialization
-  // --------------------------------------------------------------------------
-  async function init() {
-    setupEventListeners();
-    setupScrollAnimations();
-    setupSecretAdminTriggers();
-    await loadData();
-    applyDynamicLayout();
-    renderAll();
-    observeRevealElements();
-  }
-
-  // --------------------------------------------------------------------------
-  // Data Loading
-  // --------------------------------------------------------------------------
-  async function loadData() {
-    // 1. Try backend server with cache-busting timestamp
-    try {
-      const response = await fetch('/api/data?t=' + Date.now(), { cache: 'no-store' });
-      if (response.ok) {
-        portfolioData = await response.json();
-        localStorage.setItem('trista_portfolio_data', JSON.stringify(portfolioData));
-        return;
-      }
-    } catch (e) {
-      // Offline / standalone fallback
-    }
-
-    // 2. Try LocalStorage
-    const localSaved = localStorage.getItem('trista_portfolio_data');
-    if (localSaved) {
-      try {
-        portfolioData = JSON.parse(localSaved);
-        return;
-      } catch (e) {
-        console.warn('LocalStorage data parse failed.');
-      }
-    }
-
-    // 3. Fallback to bundled data/portfolio.json
-    try {
-      const fallbackResp = await fetch('data/portfolio.json?t=' + Date.now());
-      if (fallbackResp.ok) {
-        portfolioData = await fallbackResp.json();
-        localStorage.setItem('trista_portfolio_data', JSON.stringify(portfolioData));
-        return;
-      }
-    } catch (e) {
-      console.error('Failed to load data/portfolio.json', e);
-    }
-  }
-
-  // --------------------------------------------------------------------------
-  // Dynamic Layout Order & Visibility (Admin-Configurable Layout)
-  // --------------------------------------------------------------------------
-  function applyDynamicLayout() {
-    if (!portfolioData || !portfolioData.layout || !portfolioData.layout.sections || !elements.mainFlow) return;
-
-    const sectionsConfig = [...portfolioData.layout.sections].sort((a, b) => a.order - b.order);
-
-    sectionsConfig.forEach(cfg => {
-      const secEl = document.getElementById(cfg.id);
-      if (secEl) {
-        if (cfg.visible === false) {
-          secEl.style.display = 'none';
-        } else {
-          secEl.style.display = '';
-          elements.mainFlow.appendChild(secEl);
-        }
-      }
-    });
-  }
-
-  // --------------------------------------------------------------------------
-  // Rendering
-  // --------------------------------------------------------------------------
-  function renderAll() {
-    if (!portfolioData) return;
-
-    renderProfile();
-    renderMetrics();
-    renderChapters();
-    renderItems();
-    renderFrontline();
-  }
-
-  function renderProfile() {
-    const p = portfolioData.profile || {};
-
-    if (elements.heroNameDisplay) {
-      elements.heroNameDisplay.innerHTML = `Trista Hana <span class="highlight">Qonita Rahmawati</span>`;
-    }
-    if (elements.profileTitleDisplay) elements.profileTitleDisplay.textContent = p.title || '';
-    if (elements.profileSummaryDisplay) elements.profileSummaryDisplay.textContent = p.bioSummary || '';
-    if (elements.introHeadingDisplay) elements.introHeadingDisplay.textContent = p.introHeading || "Hi! Get to know me, I'm Hana.";
-    if (elements.profileWorkloadDisplay) elements.profileWorkloadDisplay.textContent = p.workloadPitch || '';
-    
-    if (elements.profileGpaStat) elements.profileGpaStat.textContent = p.gpa || '3.88';
-    if (elements.profileCreditsStat) elements.profileCreditsStat.textContent = p.credits || '84 Credits';
-    
-    if (elements.profileShortName) elements.profileShortName.textContent = p.shortName ? `Trista ${p.shortName}` : 'Trista Hana';
-    if (elements.profileMajorDisplay) elements.profileMajorDisplay.textContent = p.major || 'Bachelor of Management';
-    if (elements.profileUnivDisplay) elements.profileUnivDisplay.textContent = p.university || 'UPN "Veteran" Yogyakarta';
-    
-    if (elements.profileGpaVal) elements.profileGpaVal.textContent = (p.gpa || '3.88') + ' / 4.00';
-    if (elements.profileSksVal) elements.profileSksVal.textContent = p.credits || '84 Credits';
-    if (elements.profileCohortVal) elements.profileCohortVal.textContent = p.cohort || '2023 - Present';
-    if (elements.profileHighschoolVal) elements.profileHighschoolVal.textContent = p.highSchool || 'SMAN 7 Yogyakarta';
-    if (elements.profileLocationVal) elements.profileLocationVal.textContent = p.location || 'Yogyakarta, Indonesia';
-
-    if (elements.contactEmailVal) elements.contactEmailVal.textContent = p.email || 'tristahana@gmail.com';
-    if (elements.contactPhoneVal) elements.contactPhoneVal.textContent = p.phone || '+62 812-2960-6200';
-
-    if (p.avatar && elements.profileAvatarDisplay) {
-      elements.profileAvatarDisplay.src = p.avatar;
-    }
-    if (p.avatar && elements.profilePhotoSecondary) {
-      elements.profilePhotoSecondary.src = p.avatar;
-    }
-
-    // HR Keywords
-    if (elements.heroKeywordsContainer) {
-      elements.heroKeywordsContainer.innerHTML = '';
-      const keywords = p.keywords || [
-        'Talent Acquisition',
-        'Project & Event Coordination',
-        'Applicant Data Management',
-        'SOP Standardization',
-        'OKR Performance Tracking',
-        'Member Engagement'
-      ];
-      keywords.forEach(kw => {
-        const span = document.createElement('span');
-        span.className = 'keyword-badge';
-        span.textContent = kw;
-        elements.heroKeywordsContainer.appendChild(span);
-      });
-    }
-
-    // Skills
-    if (elements.skillsListContainer) {
-      elements.skillsListContainer.innerHTML = '';
-      (p.relatedSkills || []).forEach(skill => {
-        const span = document.createElement('span');
-        span.className = 'skill-tag accent';
-        span.innerHTML = `
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
-          <span>${escapeHtml(skill)}</span>
-        `;
-        elements.skillsListContainer.appendChild(span);
-      });
-    }
-
-    // Courses
-    if (elements.coursesListContainer) {
-      elements.coursesListContainer.innerHTML = '';
-      (p.relatedCourses || []).forEach(course => {
-        const div = document.createElement('div');
-        div.className = 'course-item';
-        div.innerHTML = `
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
-          <span>${escapeHtml(course)}</span>
-        `;
-        elements.coursesListContainer.appendChild(div);
-      });
-    }
-
-    // Tools
-    if (elements.toolsListContainer) {
-      elements.toolsListContainer.innerHTML = '';
-      (p.tools || []).forEach(tool => {
-        const span = document.createElement('span');
-        span.className = 'skill-tag';
-        span.innerHTML = `
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
-          <span>${escapeHtml(tool)}</span>
-        `;
-        elements.toolsListContainer.appendChild(span);
-      });
-    }
-  }
-
-  function renderMetrics() {
-    if (!elements.metricsContainer) return;
-    elements.metricsContainer.innerHTML = '';
-    const metrics = portfolioData.metrics || [];
-    metrics.forEach((m, idx) => {
-      const card = document.createElement('div');
-      card.className = `metric-item reveal-on-scroll reveal-stagger-${(idx % 6) + 1}`;
-      card.innerHTML = `
-        <div class="metric-value">${escapeHtml(m.value)}</div>
-        <div class="metric-label">${escapeHtml(m.label)}</div>
-        <div class="metric-desc">${escapeHtml(m.description)}</div>
-      `;
-      elements.metricsContainer.appendChild(card);
-    });
-  }
-
-  // --------------------------------------------------------------------------
-  // Default Chapters & Intelligent Chapter Matching Helper
-  // --------------------------------------------------------------------------
-  const DEFAULT_CHAPTERS = [
-    {
-      id: 'hr-campaign',
-      number: '01',
-      title: 'HR Campaign',
-      shortDesc: 'Case Competitions, Social Innovation & Youth Career Initiatives.'
-    },
-    {
-      id: 'work-experience',
-      number: '02',
-      title: 'Work Experience',
-      shortDesc: 'Strategic HR Management, Internship Program Development & Process Automation.'
-    },
-    {
-      id: 'sertifikasi',
-      number: '03',
-      title: 'Certifications',
-      shortDesc: 'National Professional Certifications & Strategic Business Foundations.'
-    },
-    {
-      id: 'project-leader',
-      number: '04',
-      title: 'Project (as Leader)',
-      shortDesc: 'Strategic HR, Operational Frameworks & People Management Initiatives.'
-    },
-    {
-      id: 'organizational',
-      number: '05',
-      title: 'Organizational Experience',
-      shortDesc: 'Student Leadership, Cross-Functional Coordination & HR Event Operations.'
-    },
-    {
-      id: 'others',
-      number: '06',
-      title: 'Others',
-      shortDesc: 'Global Summits, Liaison Logistics & Campus Event Secretariat.'
-    }
-  ];
-
-  function findChapterForItem(chapterId, chaptersList) {
-    if (!chapterId) return null;
-    const list = (chaptersList && chaptersList.length > 0) ? chaptersList : DEFAULT_CHAPTERS;
-    const raw = chapterId.toString().trim().toLowerCase();
-    const clean = raw.replace(/^\d{1,2}\.?\s*/, '').replace(/[^a-z0-9]/g, '');
-
-    // 1. Exact ID, Title, or Numbered Title match
-    const exact = list.find(c => {
-      const cId = (c.id || '').toLowerCase().trim();
-      const cTitle = (c.title || '').toLowerCase().trim();
-      const cNumbered = `${c.number}. ${c.title}`.toLowerCase().trim();
-      return cId === raw || cTitle === raw || cNumbered === raw;
-    });
-    if (exact) return exact;
-
-    // 2. Normalized match (without numbers or special characters)
-    const normalized = list.find(c => {
-      const cIdClean = (c.id || '').toLowerCase().replace(/[^a-z0-9]/g, '');
-      const cTitleClean = (c.title || '').toLowerCase().replace(/^\d{1,2}\.?\s*/, '').replace(/[^a-z0-9]/g, '');
-      return cIdClean === clean || cTitleClean === clean;
-    });
-    if (normalized) return normalized;
-
-    // 3. Synonym matching
-    if (clean.includes('certif') || clean.includes('sertif')) {
-      const hit = list.find(c => c.id === 'sertifikasi' || (c.title || '').toLowerCase().includes('certif'));
-      if (hit) return hit;
-    }
-    if (clean.includes('campaign') || clean.includes('hrcampaign')) {
-      const hit = list.find(c => c.id === 'hr-campaign' || (c.title || '').toLowerCase().includes('campaign'));
-      if (hit) return hit;
-    }
-    if (clean.includes('project') || clean.includes('leader')) {
-      const hit = list.find(c => c.id === 'project-leader' || (c.title || '').toLowerCase().includes('project'));
-      if (hit) return hit;
-    }
-    if (clean.includes('work') || clean.includes('intern') || clean.includes('job')) {
-      const hit = list.find(c => c.id === 'work-experience' || (c.title || '').toLowerCase().includes('work'));
-      if (hit) return hit;
-    }
-    if (clean.includes('organ') || clean.includes('org')) {
-      const hit = list.find(c => c.id === 'organizational' || (c.title || '').toLowerCase().includes('organ'));
-      if (hit) return hit;
-    }
-    if (clean.includes('other')) {
-      const hit = list.find(c => c.id === 'others' || (c.title || '').toLowerCase().includes('other'));
-      if (hit) return hit;
-    }
-
-    return null;
-  }
-
-  function renderChapters() {
-    if (!elements.chapterTabsBar) return;
-    elements.chapterTabsBar.innerHTML = '';
-    
-    // Ensure chapters list exists
-    if (!portfolioData.chapters || !Array.isArray(portfolioData.chapters) || portfolioData.chapters.length === 0) {
-      portfolioData.chapters = JSON.parse(JSON.stringify(DEFAULT_CHAPTERS));
-    }
-
-    // Gather defined chapters
-    const chapters = [...portfolioData.chapters];
-    const items = portfolioData.items || [];
-    
-    // Auto-discover any custom-typed chapters from items that are not in the chapters list
-    items.forEach(it => {
-      if (!it.chapterId) return;
-      const matched = findChapterForItem(it.chapterId, chapters);
-      if (!matched) {
-        chapters.push({
-          id: it.chapterId,
-          number: String(chapters.length + 1).padStart(2, '0'),
-          title: it.chapterId,
-          shortDesc: ''
-        });
-      }
-    });
-
-    // Helper to count items in chapter
-    function countForChapter(ch) {
-      return items.filter(it => {
-        if (!it.chapterId) return false;
-        if (it.chapterId === ch.id) return true;
-        const matched = findChapterForItem(it.chapterId, chapters);
-        return matched && matched.id === ch.id;
-      }).length;
-    }
-
-    // If current activeChapter has 0 items, auto-select the first chapter with > 0 items
-    const activeObj = chapters.find(c => c.id === activeChapterId);
-    if (!activeObj || countForChapter(activeObj) === 0) {
-      const firstWithItems = chapters.find(c => countForChapter(c) > 0);
-      if (firstWithItems) {
-        activeChapterId = firstWithItems.id;
-      }
-    }
-
-    chapters.forEach(ch => {
-      const count = countForChapter(ch);
-      const btn = document.createElement('button');
-      btn.className = `chapter-tab-btn ${ch.id === activeChapterId ? 'active' : ''}`;
-      btn.setAttribute('data-chapter-id', ch.id);
-      btn.innerHTML = `
-        <span class="tab-num">${escapeHtml(ch.number)}</span>
-        <span class="tab-text">${escapeHtml(ch.title)} <small style="opacity: 0.65; font-size: 0.78em;">(${count})</small></span>
-      `;
-      btn.addEventListener('click', () => {
-        activeChapterId = ch.id;
-        document.querySelectorAll('.chapter-tab-btn').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        renderItems();
-        observeRevealElements();
-      });
-      elements.chapterTabsBar.appendChild(btn);
-    });
-  }
-
-  function renderItems(searchQuery = '') {
-    if (!elements.portfolioItemsContainer) return;
-    elements.portfolioItemsContainer.innerHTML = '';
-
-    let items = portfolioData.items || [];
-    const query = searchQuery.trim().toLowerCase();
-
-    if (query) {
-      items = items.filter(it => {
-        const text = [
-          it.title,
-          it.organization,
-          it.role,
-          it.description,
-          (it.badges || []).join(' ')
-        ].join(' ').toLowerCase();
-        return text.includes(query);
-      });
-    } else if (activeChapterId !== 'all') {
-      items = items.filter(it => {
-        if (!it.chapterId) return false;
-        if (it.chapterId === activeChapterId) return true;
-        const matched = findChapterForItem(it.chapterId, portfolioData.chapters || DEFAULT_CHAPTERS);
-        return matched && matched.id === activeChapterId;
-      });
-    }
-
-    if (items.length === 0) {
-      elements.portfolioItemsContainer.innerHTML = `
-        <div style="grid-column: 1 / -1; padding: 3rem; text-align: center; background-color: var(--bg-surface); border: 1px dashed var(--border-medium); border-radius: var(--radius-sm);">
-          <p style="color: var(--text-secondary); margin-bottom: 1rem;">No portfolio items matched your search criteria.</p>
-          <button id="btn-reset-filter" class="btn btn-outline btn-sm">Reset Chapter Filter</button>
-        </div>
-      `;
-      const resetBtn = document.getElementById('btn-reset-filter');
-      if (resetBtn) {
-        resetBtn.addEventListener('click', () => {
-          activeChapterId = 'hr-campaign';
-          if (elements.portfolioSearchInput) elements.portfolioSearchInput.value = '';
-          renderChapters();
-          renderItems();
-          observeRevealElements();
-        });
-      }
-      return;
-    }
-
-    items.forEach((item, idx) => {
-      const card = document.createElement('div');
-      card.className = `item-card reveal-on-scroll reveal-stagger-${(idx % 4) + 1}`;
-
-      const chapterObj = findChapterForItem(item.chapterId, portfolioData.chapters || DEFAULT_CHAPTERS);
-      const chapterLabel = chapterObj ? `${chapterObj.number}. ${chapterObj.title}` : item.chapterId;
-      const mediaImg = item.image || 'https://images.unsplash.com/photo-1542744173-8e7e53415bb0?auto=format&fit=crop&w=800&q=80';
-
-      // Badges
-      const badgesHtml = (item.badges || []).map(b => `<span class="badge-tag">${escapeHtml(b)}</span>`).join('');
-
-      // External click links
-      let linksHtml = '';
-      if (item.links && item.links.length > 0) {
-        linksHtml = item.links.slice(0, 2).map(lk => `
-          <a href="${escapeHtml(lk.url)}" target="_blank" rel="noopener noreferrer" class="external-link-btn" title="Open link: ${escapeHtml(lk.title)}">
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
-            <span>${escapeHtml(lk.title)}</span>
-          </a>
-        `).join('');
-      }
-
-      card.innerHTML = `
-        <div class="item-card-media">
-          <img src="${escapeHtml(mediaImg)}" alt="${escapeHtml(item.title)}" loading="lazy">
-          <span class="item-card-chapter-tag">${escapeHtml(chapterLabel)}</span>
-        </div>
-        <div class="item-card-body">
-          <div class="item-card-header">
-            <div class="item-card-org">${escapeHtml(item.organization || '')}</div>
-            <h3 class="item-card-title">${escapeHtml(item.title)}</h3>
-            <div class="item-card-meta">
-              <span>${escapeHtml(item.role || '')}</span>
-              <span>•</span>
-              <span>${escapeHtml(item.period || '')}</span>
-            </div>
-          </div>
-          <p class="item-card-desc">${escapeHtml(item.description || '')}</p>
-          <div class="item-badges-list">${badgesHtml}</div>
-          <div class="item-card-footer">
-            <div class="link-pills-row">${linksHtml}</div>
-            <button class="btn btn-secondary btn-sm btn-open-detail" data-item-id="${item.id}">
-              <span>Details &amp; Process</span>
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
-            </button>
-          </div>
-        </div>
-      `;
-
-      card.querySelector('.btn-open-detail').addEventListener('click', () => {
-        openDetailModal(item);
-      });
-
-      elements.portfolioItemsContainer.appendChild(card);
-    });
-  }
-
-  function renderFrontline() {
-    const frontline = portfolioData.frontlineExperience || {};
-
-    const titleEl = document.getElementById('frontline-title-display');
-    const subtitleEl = document.getElementById('frontline-subtitle-display');
-    if (titleEl && frontline.title) titleEl.textContent = frontline.title;
-    if (subtitleEl && frontline.subtitle) subtitleEl.textContent = frontline.subtitle;
-
-    // Pillars
-    if (elements.frontlinePillarsContainer) {
-      elements.frontlinePillarsContainer.innerHTML = '';
-      const pillars = frontline.pillars || [];
-      pillars.forEach((p, idx) => {
-        const card = document.createElement('div');
-        card.className = `pillar-card reveal-on-scroll reveal-stagger-${idx + 1}`;
-        card.innerHTML = `
-          <div class="pillar-title">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-            <span>${escapeHtml(p.aspect)}</span>
-          </div>
-          <p class="pillar-desc">${escapeHtml(p.description)}</p>
-        `;
-        elements.frontlinePillarsContainer.appendChild(card);
-      });
-    }
-
-    // Placemats
-    if (elements.industryPlacematsContainer) {
-      elements.industryPlacematsContainer.innerHTML = '';
-      const placements = frontline.industryPlacemats || [];
-      placements.forEach((pm, idx) => {
-        const item = document.createElement('div');
-        item.className = `placemat-item reveal-on-scroll reveal-stagger-${(idx % 4) + 1}`;
-        item.innerHTML = `
-          <div class="placemat-name">${escapeHtml(pm.name)}</div>
-          <div class="placemat-role">${escapeHtml(pm.role)}</div>
-          <div class="placemat-focus">${escapeHtml(pm.focus)}</div>
-        `;
-        elements.industryPlacematsContainer.appendChild(item);
-      });
-    }
-  }
-
-  // --------------------------------------------------------------------------
-  // Detail Modal (Stepping Stones & Clickable Links)
-  // --------------------------------------------------------------------------
-  function openDetailModal(item) {
-    if (!elements.itemDetailModal) return;
-
-    const chObj = findChapterForItem(item.chapterId, portfolioData.chapters || DEFAULT_CHAPTERS);
-    elements.modalItemChapter.textContent = chObj ? `${chObj.number}. ${chObj.title}` : item.chapterId;
-    elements.modalItemTitle.textContent = item.title;
-    elements.modalItemOrgPeriod.textContent = `${item.organization || ''} | ${item.role || ''} | ${item.period || ''}`;
-    
-    if (item.image) {
-      elements.modalItemImage.src = item.image;
-      elements.modalItemImage.style.display = 'block';
-    } else {
-      elements.modalItemImage.style.display = 'none';
-    }
-
-    elements.modalItemDescription.textContent = item.description || '';
-
-    // Badges
-    elements.modalItemBadges.innerHTML = (item.badges || []).map(b => `<span class="badge-tag">${escapeHtml(b)}</span>`).join('');
-
-    // Stepping Stones
-    if (elements.modalSteppingStonesList) {
-      elements.modalSteppingStonesList.innerHTML = '';
-      const steps = item.steppingStones || [];
-
-      if (steps.length > 0) {
-        document.getElementById('modal-stepping-stones-section').style.display = 'block';
-        if (item.chapterId === 'sertifikasi' || (item.chapterId && item.chapterId.toLowerCase().includes('cert'))) {
-          elements.modalSteppingTitleText.textContent = 'How I Earned It & Official Verification Process';
-        } else {
-          elements.modalSteppingTitleText.textContent = 'Execution Process & Milestone Stepping Stones';
-        }
-
-        steps.forEach((st, idx) => {
-          const stepDiv = document.createElement('div');
-          stepDiv.className = 'step-card';
-          stepDiv.innerHTML = `
-            <div class="step-number-circle">${st.stepNumber || (idx + 1)}</div>
-            <div class="step-content-box">
-              <div class="step-header-row">
-                <span class="step-title">${escapeHtml(st.title)}</span>
-                ${st.metric ? `<span class="step-metric-pill">${escapeHtml(st.metric)}</span>` : ''}
-              </div>
-              <p class="step-detail">${escapeHtml(st.detail)}</p>
-            </div>
-          `;
-          elements.modalSteppingStonesList.appendChild(stepDiv);
-        });
-      } else {
-        document.getElementById('modal-stepping-stones-section').style.display = 'none';
-      }
-    }
-
-    // Clickable External Links
-    if (elements.modalItemLinks) {
-      elements.modalItemLinks.innerHTML = '';
-      const links = item.links || [];
-
-      if (links.length > 0) {
-        document.getElementById('modal-links-section').style.display = 'block';
-        links.forEach(lk => {
-          const linkCard = document.createElement('a');
-          linkCard.href = lk.url;
-          linkCard.target = '_blank';
-          linkCard.rel = 'noopener noreferrer';
-          linkCard.className = 'direct-channel-card';
-          linkCard.style.padding = '1rem 1.25rem';
-          linkCard.innerHTML = `
-            <div style="display: flex; align-items: center; gap: 1rem;">
-              <div class="direct-channel-icon" style="width: 38px; height: 38px;">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
-              </div>
-              <div style="flex-grow: 1;">
-                <div class="channel-label">Open Documentation (${escapeHtml(lk.category || 'External Link')})</div>
-                <div class="channel-value" style="font-size: 0.95rem; color: var(--blue-light);">${escapeHtml(lk.title)}</div>
-              </div>
-              <div class="channel-action">&rarr;</div>
-            </div>
-          `;
-          elements.modalItemLinks.appendChild(linkCard);
-        });
-      } else {
-        document.getElementById('modal-links-section').style.display = 'none';
-      }
-    }
-
-    elements.itemDetailModal.classList.add('active');
-    document.body.style.overflow = 'hidden';
-  }
-
-  function closeDetailModal() {
-    if (elements.itemDetailModal) {
-      elements.itemDetailModal.classList.remove('active');
-      document.body.style.overflow = '';
-    }
-  }
-
-  // --------------------------------------------------------------------------
-  // Lovable / Maya Career Coaching Scroll Engine
-  // --------------------------------------------------------------------------
-  function setupScrollAnimations() {
-    // 1. Reading Progress Bar
-    window.addEventListener('scroll', () => {
-      const scrollTop = window.scrollY || document.documentElement.scrollTop;
-      const docHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
-      const scrollPercent = docHeight > 0 ? (scrollTop / docHeight) * 100 : 0;
-
-      if (elements.scrollProgressBar) {
-        elements.scrollProgressBar.style.width = `${scrollPercent}%`;
-      }
-
-      // Scrollspy active nav item
-      updateActiveNavItem(scrollTop);
-    }, { passive: true });
-  }
-
-  function updateActiveNavItem(scrollTop) {
-    const sections = ['cover', 'intro', 'profile', 'experience', 'frontline', 'contact'];
-    let currentSectionId = 'cover';
-
-    sections.forEach(id => {
-      const el = document.getElementById(id);
-      if (el) {
-        const top = el.offsetTop - 120;
-        const height = el.offsetHeight;
-        if (scrollTop >= top && scrollTop < top + height) {
-          currentSectionId = id;
-        }
-      }
-    });
-
-    elements.navLinks.forEach(link => {
-      const href = link.getAttribute('href');
-      link.classList.toggle('active', href === `#${currentSectionId}`);
-    });
-  }
-
-  function observeRevealElements() {
-    const revealEls = document.querySelectorAll('.reveal-on-scroll');
-    if (!('IntersectionObserver' in window)) {
-      revealEls.forEach(el => el.classList.add('is-revealed'));
-      return;
-    }
-
-    const observer = new IntersectionObserver((entries, obs) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          entry.target.classList.add('is-revealed');
-          obs.unobserve(entry.target);
-        }
-      });
-    }, {
-      rootMargin: '0px 0px -40px 0px',
-      threshold: 0.1
-    });
-
-    revealEls.forEach(el => {
-      if (!el.classList.contains('is-revealed')) {
-        observer.observe(el);
-      }
-    });
-  }
-
-  // --------------------------------------------------------------------------
-  // Discrete Admin Backend Access (Recruiter-Invisible)
-  // --------------------------------------------------------------------------
-  function setupSecretAdminTriggers() {
-    // 1. Hotkey: Ctrl + Shift + A (or Alt + A)
-    window.addEventListener('keydown', e => {
-      if ((e.ctrlKey && e.shiftKey && (e.key === 'A' || e.key === 'a')) ||
-          (e.altKey && (e.key === 'A' || e.key === 'a'))) {
-        e.preventDefault();
-        window.location.href = '/admin';
-      }
-    });
-
-    // 2. Hash #admin in URL
-    if (window.location.hash === '#admin') {
-      window.location.href = '/admin';
-    }
-
-    // 3. Triple-click on the "TH" logo in top navbar
-    if (elements.brandLogoTrigger) {
-      let clickCount = 0;
-      let clickTimer = null;
-      elements.brandLogoTrigger.addEventListener('click', e => {
-        clickCount++;
-        if (clickCount === 3) {
-          e.preventDefault();
-          window.location.href = '/admin';
-        }
-        clearTimeout(clickTimer);
-        clickTimer = setTimeout(() => { clickCount = 0; }, 600);
-      });
-    }
-  }
-
-  // --------------------------------------------------------------------------
-  // Event Listeners
-  // --------------------------------------------------------------------------
-  function setupEventListeners() {
-    // Detail Modal Close
-    if (elements.btnCloseDetailModal) elements.btnCloseDetailModal.addEventListener('click', closeDetailModal);
-    if (elements.itemDetailModal) {
-      elements.itemDetailModal.addEventListener('click', e => {
-        if (e.target === elements.itemDetailModal) closeDetailModal();
-      });
-    }
-
-    // Escape Key Handler
-    window.addEventListener('keydown', e => {
-      if (e.key === 'Escape') {
-        closeDetailModal();
-      }
-    });
-
-    // Search and Filter
-    if (elements.portfolioSearchInput) {
-      elements.portfolioSearchInput.addEventListener('input', e => {
-        renderItems(e.target.value);
-        observeRevealElements();
-      });
-    }
-
-    if (elements.btnShowAllItems) {
-      elements.btnShowAllItems.addEventListener('click', () => {
-        activeChapterId = 'all';
-        document.querySelectorAll('.chapter-tab-btn').forEach(b => b.classList.remove('active'));
-        if (elements.portfolioSearchInput) elements.portfolioSearchInput.value = '';
-        renderItems();
-        observeRevealElements();
-      });
-    }
-  }
-
-  // --------------------------------------------------------------------------
-  // Utility Helpers
-  // --------------------------------------------------------------------------
-  function escapeHtml(str) {
-    if (typeof str !== 'string') return str;
-    return str
-      .replace(/&/g, '&amp;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;')
-      .replace(/"/g, '&quot;')
-      .replace(/'/g, '&#039;');
-  }
-
-  // Initialize on DOM Ready
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', init);
-  } else {
-    init();
-  }
-})();
+# ==============================================================================
+# PORTOFOLIO TRISTA HANA QONITA RAHMAWATI
+# Flask Backend - PythonAnywhere Compatible
+# Anti-Slop Compliant (R-02: Zero em dash)
+# ==============================================================================
+
+import os
+import json
+import uuid
+import base64
+from flask import (
+    Flask, send_from_directory, jsonify, request, abort, send_file
+)
+
+# ---------------------------------------------------------------------------
+# App Setup
+# ---------------------------------------------------------------------------
+BASE_DIR   = os.path.dirname(os.path.abspath(__file__))
+DATA_FILE  = os.path.join(BASE_DIR, 'data', 'portfolio.json')
+UPLOAD_DIR = os.path.join(BASE_DIR, 'uploads')
+
+app = Flask(__name__, static_folder=None)
+app.config['MAX_CONTENT_LENGTH'] = 32 * 1024 * 1024  # 32MB upload support
+
+os.makedirs(UPLOAD_DIR, exist_ok=True)
+os.makedirs(os.path.join(BASE_DIR, 'data'), exist_ok=True)
+
+# ---------------------------------------------------------------------------
+# Cache-Control: Never cache dynamic API or updated assets
+# ---------------------------------------------------------------------------
+@app.after_request
+def add_cache_headers(response):
+    response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate, max-age=0'
+    response.headers['Pragma'] = 'no-cache'
+    response.headers['Expires'] = '0'
+    return response
+
+# ---------------------------------------------------------------------------
+# Helper
+# ---------------------------------------------------------------------------
+def load_portfolio():
+    with open(DATA_FILE, 'r', encoding='utf-8') as f:
+        return json.load(f)
+
+def save_portfolio(data):
+    with open(DATA_FILE, 'w', encoding='utf-8') as f:
+        json.dump(data, f, ensure_ascii=False, indent=2)
+
+ALLOWED_EXT = {'.jpg', '.jpeg', '.png', '.gif', '.webp'}
+
+def allowed_image(filename):
+    ext = os.path.splitext(filename)[1].lower()
+    return ext in ALLOWED_EXT
+
+# ---------------------------------------------------------------------------
+# Static Files (HTML, CSS, JS, assets)
+# ---------------------------------------------------------------------------
+@app.route('/')
+def index():
+    return send_from_directory(BASE_DIR, 'index.html')
+
+@app.route('/admin')
+@app.route('/admin/')
+@app.route('/cms')
+def admin():
+    return send_from_directory(BASE_DIR, 'admin.html')
+
+@app.route('/styles.css')
+def styles():
+    return send_from_directory(BASE_DIR, 'styles.css')
+
+@app.route('/app.js')
+def appjs():
+    return send_from_directory(BASE_DIR, 'app.js')
+
+@app.route('/admin.js')
+def adminjs():
+    return send_from_directory(BASE_DIR, 'admin.js')
+
+@app.route('/assets/<path:filename>')
+def assets(filename):
+    return send_from_directory(os.path.join(BASE_DIR, 'assets'), filename)
+
+@app.route('/uploads/<path:filename>')
+def uploads(filename):
+    return send_from_directory(UPLOAD_DIR, filename)
+
+@app.route('/data/<path:filename>')
+def data_static(filename):
+    return send_from_directory(os.path.join(BASE_DIR, 'data'), filename)
+
+# ---------------------------------------------------------------------------
+# API: Portfolio Data
+# ---------------------------------------------------------------------------
+@app.route('/api/data', methods=['GET'])
+def api_get_data():
+    try:
+        data = load_portfolio()
+        return jsonify(data)
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/data', methods=['POST'])
+def api_save_data():
+    try:
+        payload = request.get_json(force=True)
+        if not payload:
+            return jsonify({'error': 'No JSON payload'}), 400
+        save_portfolio(payload)
+        return jsonify({'status': 'ok', 'success': True, 'message': 'Data saved successfully'})
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+# ---------------------------------------------------------------------------
+# API: Image Upload (base64 or multipart)
+# ---------------------------------------------------------------------------
+@app.route('/api/upload', methods=['POST'])
+def api_upload():
+    try:
+        # Multipart form upload
+        if 'file' in request.files:
+            file = request.files['file']
+            if file.filename == '':
+                return jsonify({'error': 'No file selected'}), 400
+            if not allowed_image(file.filename):
+                return jsonify({'error': 'File type not allowed'}), 400
+            ext      = os.path.splitext(file.filename)[1].lower()
+            filename = f"{uuid.uuid4().hex}{ext}"
+            file.save(os.path.join(UPLOAD_DIR, filename))
+            return jsonify({'status': 'ok', 'success': True, 'url': f'/uploads/{filename}'})
+
+        # Base64 JSON upload (from admin.js)
+        body = request.get_json(force=True) or {}
+        img_data = body.get('image') or body.get('data')
+        if img_data:
+            # Strip data URI header if present
+            if ',' in img_data:
+                header, img_data = img_data.split(',', 1)
+                if 'png' in header:
+                    ext = '.png'
+                elif 'gif' in header:
+                    ext = '.gif'
+                elif 'webp' in header:
+                    ext = '.webp'
+                else:
+                    ext = '.jpg'
+            else:
+                ext = '.jpg'
+
+            filename = f"{uuid.uuid4().hex}{ext}"
+            filepath = os.path.join(UPLOAD_DIR, filename)
+            with open(filepath, 'wb') as f:
+                f.write(base64.b64decode(img_data))
+            return jsonify({'status': 'ok', 'success': True, 'url': f'/uploads/{filename}'})
+
+        return jsonify({'error': 'No image data provided'}), 400
+
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+# ---------------------------------------------------------------------------
+# 404 Fallback
+# ---------------------------------------------------------------------------
+@app.errorhandler(404)
+def not_found(e):
+    return jsonify({'error': 'Not found'}), 404
+
+# ---------------------------------------------------------------------------
+# Local Dev Entry Point
+# ---------------------------------------------------------------------------
+if __name__ == '__main__':
+    port = int(os.environ.get('PORT', 5000))
+    print(f"\n{'='*58}")
+    print(f"  Portofolio Trista Hana - Flask Dev Server")
+    print(f"  Address: http://localhost:{port}")
+    print(f"  Admin:   http://localhost:{port}/admin")
+    print(f"{'='*58}\n")
+    app.run(host='0.0.0.0', port=port, debug=False)
